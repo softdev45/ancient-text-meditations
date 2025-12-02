@@ -400,8 +400,9 @@
 
     <!-- NEW: Thin, Dark Header Panel -->
     <div class="header-panel">
-        <h1>Adaptive Interactive word-based insight tool</h1>
-        <p>Click tiles to compose a sequence, then click "Send" for insight.</p>
+	    <!--<h1>Adaptive Interactive word-based insight tool</h1>-->
+        <h1>Meditation on the Old Prophets tool</h1>
+        <p>Click tiles to compose a sequence, then click "Send" to receive verses to meditate.</p>
     </div>
     
     <div class="main-content-container">
