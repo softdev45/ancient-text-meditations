@@ -99,6 +99,9 @@ def get_related_words():
 
 # --- Running the Service ---
 
+def start_server():
+    app.run(debug=True, port=5001)
+
 if __name__ == '__main__':
     # Flask runs on http://127.0.0.1:5000/ by default
     app.run(debug=True, port=5001)

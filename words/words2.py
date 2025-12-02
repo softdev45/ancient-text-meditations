@@ -223,7 +223,8 @@ def program():
 if __name__ == 'words2':
     #start()
     print('loading words')
-    load()
+    if not Word.db:
+        load()
     print('loaded words')
 
 def start():
