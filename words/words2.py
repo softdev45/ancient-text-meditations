@@ -155,7 +155,7 @@ def print_rows(rows):
 def load(wdb=None):
     #global db
     if not wdb:
-        wdb = main.load_new('./new2_db.csv')
+        wdb = main.load_new('./new2_db_100k.csv')
     db = list(map(lambda w: Word(w), wdb))
     Word.db = db
 
