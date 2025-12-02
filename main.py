@@ -1,0 +1,156 @@
+from flask import Flask, render_template, request, session
+from nav import get_nav_data
+
+from use_text_query import trigger_request, get_verse
+import time
+
+app = Flask(__name__)
+
+
+@app.route('/')
+def index():
+	return render_template('index.html.history_feature')
+
+
+
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+import time
+import random
+
+from verse_browser import VerseBrowser
+from func_tools import gen_book_map
+
+VB = VerseBrowser('./bible_en.xml')
+book_map = gen_book_map()
+
+
+
+# Initialize the Flask app
+# app = Flask(__name__)
+
+# Enable CORS for all routes, allowing the frontend (running on a different origin/port) to access the API.
+CORS(app)
+
+# --- Endpoint 1: Initial Grid Content (Load on Page Load) ---
+@app.route('/api/grid-content', methods=['GET'])
+def get_grid_content():
+    """
+    API endpoint to fetch the display content for all 25 squares upon page load.
+    Now includes the max_word_length limit.
+    """
+    print("Serving request for initial grid content.")
+    # Simulate a quick initial network delay
+    #time.sleep(random.uniform(0.1, 0.4)) 
+    
+    nav = get_nav_data()
+    grid_data = []
+    for i in range(1, 26):
+        # Determine the phase based on the tile number
+        title = '<br>'.join((map(lambda el: f"{el}", list(nav.items())[i-1][1])))
+        grid_data.append({
+            "id": i,
+            # This is the content that will be written inside the square
+            "display_title": f"{title}"
+        })
+        
+        
+    # NEW: Define and include the maximum word length limit
+    max_length = 9
+    
+    return jsonify({
+        "grid_data": grid_data,
+        "max_word_length": max_length
+    }), 200
+
+
+@app.route('/api/location', methods=['GET'])
+def location():
+    loc:list = request.args.get('loc')
+    interlinear:bool = bool(request.args.get('int', default=False))
+
+    print('getting loc:', loc, 'int=', interlinear)
+
+    if interlinear:
+        return jsonify(get_verse(loc))
+
+
+    loc = loc.split(',')
+    loc.remove(loc[1])
+    result = VB.query_ref(loc)
+    return jsonify(f"{result.text}")
+
+# --- Endpoint 2: Detailed Click Data (Process Word) ---
+@app.route('/api/process-word', methods=['POST'])
+def process_word():
+    """
+    API endpoint to receive the composed word string via POST and return a custom report.
+    """
+    try:
+        data = request.get_json()
+        composed_word = data.get('word', '').strip()
+    except Exception:
+        composed_word = '' # Treat as empty if parsing fails
+        
+    print(f"Received word for processing: {composed_word}")
+    
+    # Simulate longer processing time for analysisכ
+    # time.sleep(random.uniform(1.0, 2.5)) 
+
+    # --- Processing Logic ---
+    parts = composed_word.split(' ') if composed_word else []
+    num_parts = len(parts)
+    
+    if num_parts == 0:
+        return jsonify({
+            "report_title": "Processing Error",
+            "status": "Failed",
+            "color_code": "#dc2626", # Red
+            "detail": "No valid tiles were submitted to form a word."
+        }), 400
+
+    # Determine report based on number of parts
+    # if num_parts < 3:
+    #     status_message = "Short Sequence"
+    #     detail_msg = f"Sequence contains only {num_parts} part(s). Analysis is preliminary."
+    #     color = "#f59e0b" # Yellow
+    # elif num_parts <= 5:
+    #     status_message = "Standard Sequence"
+    #     detail_msg = f"Standard sequence of {num_parts} parts received. Deep analysis initiated."
+    #     color = "#10b981" # Green
+    # else:
+    #     status_message = "Complex Sequence"
+    #     detail_msg = f"Long sequence of {num_parts} parts received. Requires extensive computation."
+    #     color = "#3b82f6" # Blue
+    from nav import get_translation
+    
+    start_time = time.time()
+    # ext_res = trigger_request(get_translation(parts))
+    ext_res = trigger_request(','.join(parts))
+    import json
+    # ext_res = json.load(ext_res)
+    print(ext_res)
+
+    total_time = round(time.time() - start_time,3)
+    print(ext_res)
+    status_message = "N/A"
+    color = "#ccccc"
+
+    result = {
+        "report_title": f"{composed_word}: ({get_translation(parts)})",
+        "status": status_message,
+        "color_code": color,
+        "detail": ext_res,
+        "load_time_ms": total_time
+    }
+    print('dbg:', result)
+
+    return jsonify(result), 200 # Returns HTTP 200 success code
+
+# --- Server Run Command ---
+if __name__ == '__main__':
+    print("----------------------------------------------------------------")
+    print("Flask Server is running. Access the API at http://127.0.0.1:5000")
+    print("Run the index.html file in your browser.")
+    print("----------------------------------------------------------------")
+    app.run(debug=True, port=5000)
