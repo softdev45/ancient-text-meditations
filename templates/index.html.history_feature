@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Builder Grid</title>
+    
+    <style>
+        /* --- CSS Reset/Global --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0; 
+            padding: 0;
+            background-color: #f0f2f5;
+        }
+
+        /* --- Header Panel Styling (Thin, Dark, Full Width) --- */
+        .header-panel {
+            width: 100%;
+            background-color: #1b1133; /* Dark Blue */
+            color: white;
+            padding: 12px 0; 
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header-panel h1 {
+            color: white; 
+            margin: 0 0 5px 0; 
+            font-size: 1.5rem;
+        }
+
+        .header-panel p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* --- Main Content Container (for Centering Components) --- */
+        .main-content-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px; 
+            width: 100%;
+        }
+
+        /* --- Grid Container using CSS Grid --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            width: 500px;
+            height: 500px;
+            /* UPDATED: Thicker, more saturated border and enhanced shadow */
+            border: 2px solid #b1b4bd; 
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 15px rgba(77, 109, 212, 0.4); 
+            margin-bottom: 20px;
+            background-color: white;
+            overflow: hidden;
+            opacity: 0; 
+            transition: opacity 0.5s;
+        }
+
+        .grid-container.loaded {
+            opacity: 1;
+        }
+
+        .grid-item {
+            border: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column; 
+            justify-content: center;
+            align-items: center;
+            font-size: 0.95rem; 
+            text-align: center;
+            padding: 5px;
+            font-weight: 700; 
+            color: #4b5563;
+            cursor: pointer;
+            background-color: #f9fafb;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            user-select: none;
+        }
+
+        .grid-item .phase {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #6b7280;
+            margin-top: 3px;
+        }
+
+        .grid-item:hover {
+            background-color: #eef2ff;
+            transform: scale(1.02);
+        }
+
+        /* --- Saturation Logic (Based on data-usage-count) --- */
+        .grid-item[data-usage-count="1"] { background-color: #e6f0ff; }
+        .grid-item[data-usage-count="2"] { background-color: #cce0ff; } 
+        .grid-item[data-usage-count="3"] { background-color: #99c2ff; } 
+        .grid-item[data-usage-count="4"] { background-color: #6699ff; } 
+        .grid-item[data-usage-count="5"] { background-color: #3366ff; color: white; }
+
+        /* Visual feedback for the tiles CURRENTLY in the composed word */
+        .grid-item.in-sequence {
+             box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+             transform: scale(0.98);
+        }
+
+        /* --- Word Builder Area --- */
+        .word-builder-container {
+            width: 500px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        #word-display {
+            min-height: 40px;
+            padding: 10px;
+            border: 2px dashed #93c5fd;
+            border-radius: 8px;
+            background-color: #f9f9ff;
+            font-weight: 600;
+            color: #1e3a8a;
+            word-wrap: break-word;
+            text-align: center;
+            line-height: 1.5;
+            
+            /* Flex layout for visual tiles */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+            align-items: center;
+            align-content: center;
+        }
+        
+        #word-display .message {
+            color: #6b7280;
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        /* Styling for the small visual tile in the word panel */
+        .word-tile-visual {
+            background-color: #eaf3fc;
+            color: #060c1d;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #93c5fd;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s;
+        }
+        
+        .word-tile-visual:hover {
+            transform: translateY(-1px);
+        }
+                /* --- New: Sentence Result Blocks Styling --- */
+        .result-block-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px; /* Space between blocks */
+            justify-content: center;
+            padding: 15px;
+            background-color: #eef2ff; /* Very light blue background */
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #c7d2fe;
+            text-align: center;
+        }
+
+        .result-block-item {
+            /* background-color: #4f46e5; Indigo */
+            background-color: #b6b4d7; /* Indigo */
+            /* color: white; */
+            color: black;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            white-space: nowrap; /* Keep words on one line */
+            text-transform: uppercase;
+        }
+
+        .links-container {
+            /* display: flex; */
+            /* flex-wrap: wrap; */
+            /* gap: 8px; Space between blocks */
+            /* justify-content: center; */
+            /* padding: 15px; */
+            background-color: #e0e1e6; /* Very light blue background */
+            border-radius: 2px;
+            margin-top: 5px;
+            border: 1px solid #c8ccd9;
+            /* text-align: center; */
+        }
+        
+        .verse-links {
+            display: inline;
+            margin: 3px;
+            background-color: #d7d7d7;
+        }
+
+        /* NEW: Container for the two button rows */
+        .control-rows-container {
+            display: flex;
+            flex-direction: column; /* Stacks the rows vertically */
+            gap: 10px; /* Space between Row 1 and Row 2 */
+            width: 100%;
+            align-items: center;
+        }
+
+        /* NEW: Style for each individual button row */
+        .button-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center; 
+            width: 100%; 
+        }
+
+        .action-buttons-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center; 
+        }
+        
+        /* Style for the limit display */
+        #sequence-limit-display {
+            font-size: 0.9rem;
+            color: #4b5563;
+            font-weight: 600;
+            margin-right: 15px;
+            padding: 5px 10px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+        }
+        
+        #sequence-limit-display.limit-reached {
+            color: #dc2626; 
+            background-color: #fee2e2;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% {transform: translateX(0);}
+            20%, 60% {transform: translateX(-5px);}
+            40%, 80% {transform: translateX(5px);}
+        }
+
+
+        .action-button, .clear-button, .undo-button  {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s, opacity 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-button {
+            background-color: #10b981; 
+            color: white;
+            border: none;
+            width: 100%; /* Make the send button full width of its container */
+            max-width: 400px; /* Optional: limit width on large screens */
+
+                    /* MAKE IT LARGER AND MORE PROMINENT */
+            padding: 12px 25px; /* Increased padding */
+            font-size: 1.1rem; /* Slightly larger text */
+            font-weight: 800; /* Bolder text */
+        }
+
+        .action-button:hover:enabled {
+            background-color: #059669;
+            transform: translateY(-1px);
+        }
+                
+        /* NEW: Undo Button Styling */
+        .undo-button {
+            background-color: #60a5fa; /* Blue-500 */
+            color: white;
+            border: none;
+        }
+
+        .undo-button:hover:enabled {
+            background-color: #3b82f6; /* Blue-600 */
+            transform: translateY(-1px);
+        }
+
+        .clear-button {
+            background-color: #f87171; 
+            color: white;
+            border: none;
+        }
+
+        .clear-button:hover:enabled {
+            background-color: #ef4444;
+            transform: translateY(-1px);
+        }
+
+        .action-button:disabled, .clear-button:disabled, .undo-button:disabled  {
+            background-color: #e5e7eb;
+            color: #6b7280;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* --- Content Display & History Styling --- */
+        #content-display {
+            width: 500px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Space between history items */
+            min-height: 150px;
+            text-align: center;
+        }
+        
+        .message {
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .report-card {
+            text-align: left;
+            padding-left: 15px;
+            padding-top: 5px;
+            border-left: 5px solid;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            padding: 15px;
+        }
+        
+        .report-card h2 {
+            color: #1e3a8a;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .report-card p {
+            margin: 5px 0;
+            color: #374151;
+        }
+
+        .report-line {
+            border-top: 1px dashed #bbb;
+        }
+
+        .verse-ref-link-unclicked {
+            text-decoration: underline;
+            border: 1px dotted #bbb;
+        }
+
+        /* Styling for the foldable history item */
+        .history-item {
+            margin: 0;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        
+        .history-item details {
+            margin: 0;
+            border: none;
+        }
+        
+        .history-item summary {
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+            padding: 5px 0;
+        }
+
+        .history-item details[open] .report-card {
+            margin-top: 10px;
+            background-color: #f0f8ff; /* Light blue background for open details */
+        }
+
+        .error-message {
+            color: #b91c1c;
+            background-color: #fee2e2;
+            padding: 15px;
+            border: 1px solid #ef4444;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NEW: Thin, Dark Header Panel -->
+    <div class="header-panel">
+        <h1>Adaptive Interactive word-based insight tool</h1>
+        <p>Click tiles to compose a sequence, then click "Send" for insight.</p>
+    </div>
+    
+    <div class="main-content-container">
+
+        <div class="grid-container" id="square-grid">
+            <p style="grid-column: 1 / -1; align-self: center;" class="message">Loading grid content from server...</p>
+        </div>
+
+        <div class="word-builder-container">
+            <div id="word-display" class="word-display-area">
+                <span class="message">Click tiles to build a sequence...</span>
+            </div>
+            <div class="control-rows-container">
+                <!-- Row 1: Limit, Undo, Clear -->
+                <div class="button-row">
+                    <span id="sequence-limit-display">Loading Limit...</span>
+                    <button id="undo-button" class="undo-button" disabled>Undo</button>
+                    <button id="clear-button" class="clear-button" disabled>Clear Sequence</button>
+                </div>
+                <!-- Row 2: Send Button (Now separate) -->
+                <div class="button-row">
+                    <button id="send-button" class="action-button" disabled>Send Word for Analysis</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Display now holds the History list -->
+        <div id="content-display">
+            <p class="message" id="status-message">Awaiting initial content load...</p>
+        </div>
+    </div> <!-- End main-content-container -->
+
+    <script>
+        globalThis.HIST = [];
+        // --- JavaScript Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const gridContainer = document.getElementById('square-grid');
+            const contentDisplay = document.getElementById('content-display');
+            const statusMessage = document.getElementById('status-message');
+            const wordDisplay = document.getElementById('word-display');
+            const sendButton = document.getElementById('send-button');
+            const clearButton = document.getElementById('clear-button');
+            const undoButton = document.getElementById('undo-button'); // NEW REFERENCE
+            const sequenceLimitDisplay = document.getElementById('sequence-limit-display');
+            
+            // --- API Endpoints ---
+            const API_BASE = 'http://127.0.0.1:5000/api/';
+            const GRID_CONTENT_URL = API_BASE + 'grid-content';
+            const PROCESS_WORD_URL = API_BASE + 'process-word'; // POST endpoint
+            const LOC_URL = API_BASE + 'location'; // POST endpoint
+
+            // State
+            let composedWord = []; 
+            let tileUsageCount = {}; 
+            let isProcessing = false;
+            let MAX_WORD_LENGTH = 9; // Default value, will be updated by backend
+            let reportHistory = []; // NEW: Array to store analysis history
+            globalThis.HIST = reportHistory
+
+            // --- UI/State Management ---
+            
+            function updateWordDisplay() {
+                // Renders the visual tiles in the composition panel
+                wordDisplay.innerHTML = '';
+                
+                const currentLength = composedWord.length;
+
+                // Update the limit display
+                sequenceLimitDisplay.textContent = `Length: ${currentLength}/${MAX_WORD_LENGTH}`;
+                if (currentLength >= MAX_WORD_LENGTH) {
+                    sequenceLimitDisplay.classList.add('limit-reached');
+                } else {
+                    sequenceLimitDisplay.classList.remove('limit-reached');
+                }
+
+                if (currentLength === 0) {
+                    wordDisplay.innerHTML = '<span class="message">Click tiles to build a sequence...</span>';
+                    sendButton.disabled = true;
+                    clearButton.disabled = true;
+                    undoButton.disabled = true;
+                } else {
+                    composedWord.forEach(tile => {
+                        const tileVisual = document.createElement('div');
+                        tileVisual.classList.add('word-tile-visual');
+                        tileVisual.textContent = tile.title;
+                        tileVisual.setAttribute('data-tile-id', tile.id);
+                        wordDisplay.appendChild(tileVisual);
+                    });
+                    
+                    // Send button is enabled if there's a word and not processing
+                    sendButton.disabled = isProcessing || currentLength === 0;
+                    clearButton.disabled = isProcessing || currentLength === 0;
+                    undoButton.disabled = isProcessing; // NEW: Enable undo if not processing and not empty
+                }
+            }
+
+            function setProcessingState(state) {
+                isProcessing = state;
+                
+                sendButton.disabled = state;
+                clearButton.disabled = state;
+                undoButton.disabled = state; 
+
+                
+                // Set grid interaction state
+                document.querySelectorAll('.grid-item').forEach(item => {
+                    item.style.opacity = state ? '0.7' : '1';
+                    item.style.pointerEvents = state ? 'none' : 'auto';
+                });
+            }
+            
+            // Resets the visual sequence state (temporary selection)
+            function resetSequenceState() {
+                composedWord = []; // Clear the sequence
+                
+                // Remove the temporary visual class from all tiles
+                document.querySelectorAll('.grid-item.in-sequence').forEach(item => {
+                    item.classList.remove('in-sequence');
+                });
+            }
+            
+            // Resets the permanent usage count and visual saturation
+            function clearAllUsageCounts() {
+                // 1. Reset the JavaScript state tracking object
+                tileUsageCount = {};
+                
+                // 2. Reset the DOM attribute for visual saturation
+                document.querySelectorAll('.grid-item').forEach(item => {
+                    item.setAttribute('data-usage-count', '0');
+                });
+            }
+                        // NEW FUNCTION: Undo the last selection
+            function undoLastSelection() {
+                if (composedWord.length === 0 || isProcessing) return;
+
+                // 1. Remove the last tile from the sequence array
+                const undoneTile = composedWord.pop();
+
+                // 2. Decrement the usage count for this tile's ID
+                tileUsageCount[undoneTile.id] = (tileUsageCount[undoneTile.id] || 1) - 1; 
+
+                // 3. Find the corresponding grid element
+                const square = document.querySelector(`[data-square-id="${undoneTile.id}"]`);
+                if (square) {
+                    const currentCount = tileUsageCount[undoneTile.id];
+                    
+                    // Update visual saturation
+                    square.setAttribute('data-usage-count', Math.min(5, currentCount));
+                    
+                    // 4. Check if this tile ID is no longer present in the sequence
+                    // If the tile is no longer used in the sequence, remove the "in-sequence" visual feedback.
+                    const isIdStillInUse = composedWord.some(tile => tile.id === undoneTile.id);
+                    if (!isIdStillInUse) {
+                        square.classList.remove('in-sequence');
+                    }
+                }
+                
+                // 5. Update the word panel and button states
+                updateWordDisplay();
+            }
+
+            function hasChildWithInnerText(parentElement, textToFind) {
+                console.log(textToFind)
+                // 1. Get ALL descendant elements of the parent.
+                // The '*' selector means "match any element".
+                const allDescendants = parentElement.querySelectorAll('*');
+
+                // 2. Trim the search text once for efficiency.
+                const trimmedTextToFind = textToFind.trim();
+
+                // 3. Iterate over the descendants to check their innerText.
+                for (const child of allDescendants) {
+                    // We use innerText because it represents the visible, rendered text.
+                    // We trim the child's text for a reliable exact match.
+                    if (child.innerText.trim().includes(trimmedTextToFind)) {
+                        return true; // Found a match, stop searching and return true
+                    }
+                }
+
+                return false; // No match found after checking all descendants
+            }
+            /**
+             * Searches for an element containing the given text within a specific parent element.
+             * * @param {string} searchText - The text content to search for.
+             * @param {HTMLElement | string} [parentNode=document] - The parent element or its ID (string) to start the search from. Defaults to the entire document.
+             * @param {string} [tagName='*'] - The HTML tag name to limit the search to (e.g., 'p', 'a', 'div'). Use '*' to search all elements.
+             * @returns {HTMLElement | null} The first matching element, or null if none is found.
+             */
+            function findElementByText(searchText, parentNode = document, tagName = '*') {
+                let parentElement;
+
+            // Determine the actual parent element to start the search from
+                if (typeof parentNode === 'string') {
+                    // If a string is passed, treat it as an ID
+                    parentElement = document.getElementById(parentNode);
+                    if (!parentElement) {
+                        console.error(`Parent element with ID "${parentNode}" not found.`);
+                        return null;
+                    }
+                } else if (parentNode instanceof HTMLElement || parentNode === document) {
+                    // If an HTMLElement object or the document is passed
+                    parentElement = parentNode;
+                } else {
+                    console.error("Invalid parentNode provided. Must be an HTMLElement, a string ID, or 'document'.");
+                    return null;
+                }
+
+                // 1. Get all descendants of the parent matching the tag name
+                // We use querySelectorAll on the parentElement instead of document
+                const elements = parentElement.querySelectorAll(tagName);
+
+                // 2. Search for the text content
+                const foundElement = Array.from(elements).find(element => {
+                    // Use textContent for efficient, case-insensitive, partial-match search
+                    const elementText = element.textContent.toLowerCase().trim();
+                    const searchLower = searchText.toLowerCase().trim();
+
+                    return elementText.includes(searchLower);
+                });
+
+                return foundElement;
+            }
+
+            function createLink(loc, parent=null) {
+                        console.log(loc)
+                        const links = document.createElement('div')
+                        links.classList.add('links-container')
+                        const get_verse_link = document.createElement('div')
+                        const get_verse_interlinear = document.createElement('div')
+                        // if(parent){
+                        //     parent.appendChild(link);
+                        // }
+                        // get_verse_link.innerText = loc.map((el,ind)=> `(${el})` ? ind==1 : el).filter((el, ind) => ind != 1).join(':');
+                        get_verse_link.innerText = loc.map((el,ind)=> ind==1 ? `(${el})`  : el).join(':');
+                        get_verse_link.classList.add('verse-ref-link-unclicked','verse-links')
+
+                        get_verse_interlinear.innerText = "[load interlinear]"//loc.filter((el, ind) => ind != 1).join(':');
+                        get_verse_interlinear.classList.add('verse-ref-link-unclicked', 'verse-links')
+                        // get_verse_interlinear.style.display = 'inline';
+                        // parent.appendChild(get_verse_interlinear);
+                        // parent.insertBefore(get_verse_interlinear,get_verse_link);
+                        links.appendChild(get_verse_link);
+                        links.appendChild(get_verse_interlinear);
+
+                        get_verse_interlinear.addEventListener('click', async () => {
+                            try {
+                                // --- 2. Query Server for Data ---
+                                const response = await fetch(LOC_URL + `?loc=${encodeURIComponent(loc)}&int=true`);
+
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! Status: ${response.status}`);
+                                }
+
+                                const data = await response.json(); // Process the response body as JSON
+
+                                // link.removeEventListener('click', )
+                                get_verse_interlinear.classList.remove('verse-ref-link-unclicked');
+
+                                // --- 3. Process and Add Data to Page ---
+                                const verseText = document.createElement('div');
+                                console.log(data);
+                                verseText.appendChild(createSentenceBlocks(data));
+                                get_verse_interlinear.appendChild(verseText); //link -< parent
+
+
+                            } catch (error) {
+                                console.error("Fetch error:", error);
+                                get_verse_interlinear.innerHTML = `Error fetching data for ${loc}: ${error.message}`;
+                            }
+
+                        }, {once:true});
+
+                        get_verse_link.addEventListener('click', async () => {
+                            try {
+                                // --- 2. Query Server for Data ---
+                                const response = await fetch(LOC_URL + `?loc=${encodeURIComponent(loc)}`);
+
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! Status: ${response.status}`);
+                                }
+
+                                const data = await response.json(); // Process the response body as JSON
+
+                                // link.removeEventListener('click', )
+                                get_verse_link.classList.remove('verse-ref-link-unclicked');
+
+                                // --- 3. Process and Add Data to Page ---
+                                const verseText = document.createElement('div');
+                                verseText.innerText = data;
+                                get_verse_link.appendChild(verseText); //link -< parent
+
+                                    next = loc.slice()
+                                    next[next.length-1] = Number(next.at(-1))+1
+                                    // prev = prev.join(',')
+                                    // link.insertBefore(createLink(prev,true), result)
+                                    if (!hasChildWithInnerText(parent, next.join(',')))
+                                        parent.appendChild(createLink(next,parent))
+
+                                    prev = loc.slice()
+                                    prev[prev.length-1] = Number(prev.at(-1))-1
+                                    if (!hasChildWithInnerText(parent, prev.join(',')))
+                                        parent.prepend(createLink(prev,parent))
+
+                            } catch (error) {
+                                console.error("Fetch error:", error);
+                                get_verse_link.innerHTML = `Error fetching data for ${loc}: ${error.message}`;
+                            }
+
+                        }, {once:true});
+
+
+                        // return get_verse_link;
+                        return links;
+
+
+                        
+
+            }
+
+            function createWordEntry(word_report) {
+                        const resultLine = document.createElement('div');
+                        resultLine.classList.add('report-line')
+                        resultLine.innerText = JSON.stringify(word_report.en + `(${word_report.root})`);
+                        const verses = document.createElement('div');
+                        resultLine.appendChild(verses);
+                        const link = createLink(word_report['loc'],verses)
+                        verses.appendChild(link)
+
+                        return resultLine
+            }
+
+                        /**
+             * Creates a visual DIV container with the words from a list displayed as blocks.
+             * @param {string[]} wordList - Array of words/strings to display as blocks.
+             * @returns {HTMLElement} A DIV element containing the word blocks.
+             */
+            function createSentenceBlocks(wordList) {
+                const container = document.createElement('div');
+                container.classList.add('result-block-container'); // Styled for flex layout and background
+
+                if (!Array.isArray(wordList) || wordList.length === 0) {
+                    container.textContent = "No result blocks to display.";
+                    container.classList.add('message');
+                    return container;
+                }
+
+                wordList.forEach(word => {
+                    const block = document.createElement('div');
+                    block.style.display = "inline";
+                    block.classList.add('result-block-item'); // Styled as a colored block
+                    // block.textContent = word.join('<br>');
+                    word.slice(0,4).forEach(part => {
+                        const subblock = document.createElement('div');
+                        subblock.innerText = part
+                        block.appendChild(subblock);
+
+                    })
+                    container.appendChild(block);
+                });
+
+                return container;
+            }
+            
+            // NEW FUNCTION: Renders the entire history of reports
+            function renderHistory() {
+                if (reportHistory.length === 0) {
+                    contentDisplay.innerHTML = '<p class="message" id="status-message">Awaiting first successful analysis report...</p>';
+                    return;
+                }
+
+                contentDisplay.innerHTML = '';
+                
+                // Iterate backwards to put the newest report on top
+                for (let i = reportHistory.length - 1; i >= 0; i--) {
+                    const report = reportHistory[i];
+                    const isLatest = (i === reportHistory.length - 1);
+                    
+                    console.log(report);
+                    
+                    
+                    const card = document.createElement('div');
+                    card.classList.add('report-card');
+                    card.style.borderLeftColor = report.color_code;
+                    
+                    // Full content HTML structure
+                    card.innerHTML = `
+                        <h2>${report.report_title}</h2>
+                        <p><strong>Status:</strong> <span style="color: ${report.color_code}; font-weight: bold;">${report.status}</span></p>
+                        <p>${report.detail}</p>
+                        <p><small>Processing time: ${report.load_time_ms}ms</small></p>
+                    `;
+                    
+                    for (let j = 0; j < report['detail']['related'].length; j++){
+                        card.appendChild(createWordEntry(report['detail']['related'][j]));
+                    }
+
+                    if (isLatest) {
+                        // Display the latest report in full
+                        contentDisplay.appendChild(card);
+                    } else {
+                        // Fold older reports into a <details> element
+                        const historyItem = document.createElement('div');
+                        historyItem.classList.add('history-item');
+                        
+                        const details = document.createElement('details');
+                        const summary = document.createElement('summary');
+                        summary.textContent = `Report: ${report.report_title} | Status: ${report.status}`;
+                        
+                        details.appendChild(summary);
+                        details.setAttribute('open', '');
+                        details.appendChild(card); // Append the full card structure inside details
+                        historyItem.appendChild(details);
+                        
+                        contentDisplay.appendChild(historyItem);
+                    }
+                }
+            }
+
+
+            function renderError(message) {
+                // Keep renderError separate as it displays a temporary, critical message
+                contentDisplay.innerHTML = `
+                    <div class="error-message">
+                        <h3>⚠️ Fetch Error</h3>
+                        <p>${message}</p>
+                        <p><strong>Please ensure your Python Flask server is running on <a href="${API_BASE.slice(0, -5)}" target="_blank">http://127.0.0.1:5000</a>.</strong></p>
+                    </div>
+                `;
+            }
+            
+            // --- Stage 1: Initial Grid Load ---
+            async function loadInitialGrid() {
+                try {
+                    statusMessage.textContent = 'Fetching grid titles and limits...';
+                    gridContainer.innerHTML = ''; 
+                    
+                    const response = await fetch(GRID_CONTENT_URL);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    
+                    const gridData = data.grid_data;
+                    // Set MAX_WORD_LENGTH from backend response
+                    MAX_WORD_LENGTH = data.max_word_length || 9; 
+
+                    gridData.forEach(item => {
+                        const square = document.createElement('div');
+                        square.classList.add('grid-item');
+                        square.setAttribute('data-square-id', item.id);
+                        square.innerHTML = item.display_title;
+                        square.setAttribute('data-usage-count', '0'); 
+                        gridContainer.appendChild(square);
+                    });
+
+                    gridContainer.classList.add('loaded');
+                    statusMessage.textContent = `Grid loaded successfully. Max sequence length is ${MAX_WORD_LENGTH}.`;
+                    updateWordDisplay(); // Initialize limit display
+                    
+                } catch (error) {
+                    console.error('Initial Grid Load Error:', error);
+                    gridContainer.innerHTML = '';
+                    renderError(`Failed to load initial grid data from server: ${error.message}`);
+                }
+            }
+            
+            // --- Stage 2: Send Word to Server ---
+            async function sendWordForAnalysis() {
+                if (composedWord.length === 0 || isProcessing) return;
+
+                setProcessingState(true);
+                
+                contentDisplay.innerHTML = `<p class="message">Sending sequence for analysis...</p>`;
+
+                const wordString = composedWord.map(tile => tile.title).join(' ');
+
+                try {
+                    const response = await fetch(PROCESS_WORD_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ word: wordString })
+                    });
+                    
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        renderError(data.detail || data.message || `Server responded with status ${response.status}.`);
+                    } else {
+                        // 1. Add the successful report to history
+                        reportHistory.push({
+                            report_title: data.report_title,
+                            status: data.status,
+                            detail: data.detail,
+                            color_code: data.color_code,
+                            load_time_ms: data.load_time_ms,
+                            timestamp: Date.now()
+                        });
+
+                        // 2. Render the updated history (newest on top)
+                        renderHistory();
+                        
+                        // 3. Clear the sequence and temporary visual state
+                        resetSequenceState();
+                        
+                        // 4. Clear permanent usage counts (saturation)
+                        clearAllUsageCounts(); 
+                    }
+                } catch (error) {
+                    console.error('Analysis Request Error:', error);
+                    renderError(`Could not connect to the analysis endpoint. (${error.message})`);
+                } finally {
+                    setProcessingState(false);
+                    updateWordDisplay();
+                }
+            }
+
+            // --- Event Listeners ---
+            
+            // Grid Click (Build Word)
+            gridContainer.addEventListener('click', (event) => {
+                const square = event.target.closest('.grid-item');
+                if (!square || isProcessing) return;
+                
+                // Check if maximum length is reached
+                if (composedWord.length >= MAX_WORD_LENGTH) {
+                    console.warn(`Maximum sequence length (${MAX_WORD_LENGTH}) reached.`);
+                    sequenceLimitDisplay.classList.add('limit-reached'); 
+                    return; 
+                }
+
+                const tileId = square.getAttribute('data-square-id');
+                // Get only the main title text ("Tile X")
+                const tileTitle = square.firstChild.textContent.trim(); 
+                
+                // --- CONSECUTIVE USE LIMIT CHECK (Max 2) ---
+                const maxConsecutive = 2;
+                const currentLength = composedWord.length;
+
+                // Checks if the last 3 tiles added have the same ID as the current tile
+                if (currentLength >= maxConsecutive && 
+                    composedWord.slice(currentLength - maxConsecutive).every(tile => tile.id === tileId)) {
+                    
+                    console.warn(`Tile ${tileTitle} (ID: ${tileId}) cannot be used more than ${maxConsecutive} times consecutively.`);
+                    return; 
+                }
+                // --- END CONSECUTIVE CHECK ---
+                
+                // 1. Update Usage Count (for saturation)
+                const currentCount = (tileUsageCount[tileId] || 0) + 1;
+                tileUsageCount[tileId] = currentCount;
+                // Cap the usage count at 5 for visual CSS rules
+                square.setAttribute('data-usage-count', Math.min(5, currentCount)); 
+                
+                // 2. Update Current Sequence (for word panel)
+                composedWord.push({ id: tileId, title: tileTitle });
+                square.classList.add('in-sequence');
+                
+                updateWordDisplay();
+            });
+            
+            // Send Button Click
+            sendButton.addEventListener('click', sendWordForAnalysis);
+            // Undo Button Click (NEW)
+            undoButton.addEventListener('click', undoLastSelection);
+                        
+            // Clear Button Click
+            clearButton.addEventListener('click', () => {
+                if (isProcessing) return;
+                
+                resetSequenceState(); // Clear temporary sequence and visual state
+                clearAllUsageCounts(); // Clear permanent usage counts and saturation
+                
+                // When clearing, we just reset the usage count, but keep the history displayed
+                updateWordDisplay();
+            });
+
+            // Start the initial load process
+            loadInitialGrid();
+        });
+    </script>
+</body>
+</html>
