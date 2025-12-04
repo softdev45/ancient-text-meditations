@@ -158,6 +158,7 @@ def load(wdb=None):
     #global db
     if not wdb and not Word.db:
         wdb = main.load_new('./new2_db_100k.csv')
+        # wdb = main.load_new('./new2_db.csv')
     db = list(map(lambda w: Word(w), wdb))
     Word.db = db
 

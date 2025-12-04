@@ -487,8 +487,8 @@
             const sequenceLimitDisplay = document.getElementById('sequence-limit-display');
             
             // --- API Endpoints ---
-            // const API_BASE = 'https://ancient-text-meditations.onrender.com/api/';
-            const API_BASE = 'http://127.0.0.1:5000/api/';
+            const API_BASE = 'https://ancient-text-meditations.onrender.com/api/';
+            // const API_BASE = 'http://127.0.0.1:5000/api/';
             const GRID_CONTENT_URL = API_BASE + 'grid-content';
             const PROCESS_WORD_URL = API_BASE + 'process-word'; // POST endpoint
             const LOC_URL = API_BASE + 'location'; // POST endpoint
