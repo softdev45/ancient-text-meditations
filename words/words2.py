@@ -153,8 +153,10 @@ def print_rows(rows):
 
 
 def load(wdb=None):
+    import traceback
+    traceback.print_stack()
     #global db
-    if not wdb:
+    if not wdb and not Word.db:
         wdb = main.load_new('./new2_db_100k.csv')
     db = list(map(lambda w: Word(w), wdb))
     Word.db = db

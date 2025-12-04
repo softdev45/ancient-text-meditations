@@ -24,7 +24,7 @@ from func_tools import gen_book_map
 VB = VerseBrowser('./bible_en.xml')
 book_map = gen_book_map()
 
-
+from heb_char import h_rev
 
 # Initialize the Flask app
 # app = Flask(__name__)
@@ -51,7 +51,8 @@ def get_grid_content():
         grid_data.append({
             "id": i,
             # This is the content that will be written inside the square
-            "display_title": f"{title}"
+            "display_title": f"{title}",
+            "symbol": f"{h_rev[i-1][0] if i < 23 else ''}"
         })
         
         
@@ -136,9 +137,18 @@ def process_word():
     status_message = "N/A"
     color = "#ccccc"
 
+    translated = get_translation(parts)
+    words_transl = list(zip(parts, translated))
+    print(words_transl)
+
+    input_mapped = list(map(lambda elem: elem[0] + f"({elem[1]}) ", words_transl))
+
     result = {
-        "report_title": f"{composed_word}: ({get_translation(parts)})",
-        "status": status_message,
+        "title": f"{composed_word}: ({get_translation(parts)})",
+        "input_parts": parts,
+        # "parts_translation": translated,
+        "input_word": f"{' '.join(input_mapped)}",
+        "input_translation": translated,
         "color_code": color,
         "detail": ext_res,
         "load_time_ms": total_time

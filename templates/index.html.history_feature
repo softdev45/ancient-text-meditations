@@ -14,6 +14,22 @@
             background-color: #f0f2f5;
         }
 
+	@font-face {
+		font-family: 'OHFont'; /* This is the name you will use in your CSS */
+		src: url('fonts/OHfont.ttf') format('ttf'), /* Modern browsers */
+		url('fonts/OHfont.woff') format('ttf');   /* Older browsers */
+	font-weight: normal; /* Define the weight (e.g., normal, bold, 400, 700) */
+	font-style: normal;  /* Define the style (e.g., normal, italic) */
+	}
+
+	.oh-font {
+		font-family: 'OHFont';
+	}
+	.large-font{
+		font-size: 2em;
+        font-weight: 700;
+	}
+
         /* --- Header Panel Styling (Thin, Dark, Full Width) --- */
         .header-panel {
             width: 100%;
@@ -50,7 +66,7 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             width: 500px;
-            height: 500px;
+            /* height: 500px; */
             /* UPDATED: Thicker, more saturated border and enhanced shadow */
             border: 2px solid #b1b4bd; 
             border-radius: 12px;
@@ -89,6 +105,28 @@
             color: #6b7280;
             margin-top: 3px;
         }
+
+                /* NEW: Hidden character that appears on hover */
+        .grid-item .hover-char {
+            position: static;
+            /* top: 0; */
+            /* left: 0; */
+            /* transform: translate(-50%, -50%); */
+            font-size: 2rem;
+            font-weight: 900;
+            color: #6a6a6a; /* Bright Amber/Orange color */
+            visibility: visible;
+            /* opacity: 0.4; */
+            /* transition: opacity 0.2s ease-in-out; */
+            /* z-index: 10; Ensures it sits over the text */
+            pointer-events: none; /* Prevents blocking clicks */
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+        }
+        /* Show the character on hover */
+        .grid-item:hover .hover-char {
+            opacity: 1;
+        }
+        
 
         .grid-item:hover {
             background-color: #eef2ff;
@@ -180,12 +218,12 @@
             /* color: white; */
             color: black;
             font-size: 1rem;
-            font-weight: 700;
+            font-weight: 500;
             padding: 8px 12px;
             border-radius: 6px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             white-space: nowrap; /* Keep words on one line */
-            text-transform: uppercase;
+            /* text-transform: uppercase; */
         }
 
         .links-container {
@@ -449,7 +487,8 @@
             const sequenceLimitDisplay = document.getElementById('sequence-limit-display');
             
             // --- API Endpoints ---
-            const API_BASE = 'https://ancient-text-meditations.onrender.com/api/';
+            // const API_BASE = 'https://ancient-text-meditations.onrender.com/api/';
+            const API_BASE = 'http://127.0.0.1:5000/api/';
             const GRID_CONTENT_URL = API_BASE + 'grid-content';
             const PROCESS_WORD_URL = API_BASE + 'process-word'; // POST endpoint
             const LOC_URL = API_BASE + 'location'; // POST endpoint
@@ -725,7 +764,17 @@
             function createWordEntry(word_report) {
                         const resultLine = document.createElement('div');
                         resultLine.classList.add('report-line')
-                        resultLine.innerText = JSON.stringify(word_report.en + `(${word_report.root})`);
+                        const word_en = document.createElement('span')
+                        word_en.innerText = word_report.en + ": "
+                        const word_hb = document.createElement('span')
+                        word_hb.innerText = word_report.root
+                        word_hb.classList.add('large-font')
+
+
+                        // resultLine.innerText = JSON.stringify(word_report.en + `(${word_report.root})`);
+                        resultLine.appendChild(word_en)
+                        resultLine.appendChild(word_hb)
+
                         const verses = document.createElement('div');
                         resultLine.appendChild(verses);
                         const link = createLink(word_report['loc'],verses)
@@ -752,10 +801,13 @@
                 wordList.forEach(word => {
                     const block = document.createElement('div');
                     block.style.display = "inline";
-                    block.classList.add('result-block-item'); // Styled as a colored block
+                    block.classList.add('result-block-item', 'oh-font'); // Styled as a colored block
                     // block.textContent = word.join('<br>');
-                    word.slice(0,4).forEach(part => {
+                    word.slice(0,4).forEach((part,index) => {
                         const subblock = document.createElement('div');
+                        if (index <= 1){
+                            subblock.classList.add('large-font')
+                        }
                         subblock.innerText = part
                         block.appendChild(subblock);
 
@@ -784,16 +836,32 @@
                     
                     
                     const card = document.createElement('div');
-                    card.classList.add('report-card');
+                    card.classList.add('report-card', 'oh-font', 'large-font');
                     card.style.borderLeftColor = report.color_code;
+
+                    const title = document.createElement('span')
+
+                    report.input_parts.forEach((elem,index) => {
+                        const part = document.createElement('span')
+                        const symbol = document.createElement('span')
+                        part.innerHTML = ` ${elem} `
+                        symbol.classList.add('large-font')
+                        symbol.innerHTML = `${report.input_translation[index]}`
+                        title.appendChild(part)
+                        title.appendChild(symbol)
+                    })
+
                     
                     // Full content HTML structure
-                    card.innerHTML = `
-                        <h2>${report.report_title}</h2>
-                        <p><strong>Status:</strong> <span style="color: ${report.color_code}; font-weight: bold;">${report.status}</span></p>
-                        <p>${report.detail}</p>
-                        <p><small>Processing time: ${report.load_time_ms}ms</small></p>
+                    card.appendChild(title);
+
+                    card.innerHTML += `
+                        <p><small>[Processing time: ${report.load_time_ms}ms]</small></p>
                     `;
+                        // removed ^^^
+                        // <h2>${report.input_word}: <span class="large-font">${report.input_translation}</span></h2>
+                        // <p><strong>Status:</strong> <span style="color: ${report.color_code}; font-weight: bold;">${report.status}</span></p>
+                        // <p>${report.detail}</p>
                     
                     for (let j = 0; j < report['detail']['related'].length; j++){
                         card.appendChild(createWordEntry(report['detail']['related'][j]));
@@ -809,7 +877,8 @@
                         
                         const details = document.createElement('details');
                         const summary = document.createElement('summary');
-                        summary.textContent = `Report: ${report.report_title} | Status: ${report.status}`;
+                        summary.textContent = `Report: ${report.input_word}`;// | Status: ${report.status}`;
+                        summary.classList.add('oh-font', 'large-font')
                         
                         details.appendChild(summary);
                         details.setAttribute('open', '');
@@ -849,12 +918,27 @@
                     // Set MAX_WORD_LENGTH from backend response
                     MAX_WORD_LENGTH = data.max_word_length || 9; 
 
-                    gridData.forEach(item => {
+                    gridData.forEach((item,index) => {
                         const square = document.createElement('div');
+                        // square.classList.add('grid-item');
+                        // square.setAttribute('data-square-id', item.id);
+                        // square.innerHTML = item.display_title;
+                        // square.setAttribute('data-usage-count', '0'); 
+                        const hoverChar = item.symbol;// Get first letter
+                    
                         square.classList.add('grid-item');
                         square.setAttribute('data-square-id', item.id);
-                        square.innerHTML = item.display_title;
-                        square.setAttribute('data-usage-count', '0'); 
+                        
+                        // We assume item.phase_text exists or provide a fallback
+                        // const phaseText = item.phase_text || `P${(index % 5) + 1}`; 
+                        
+                        // 1. Updated innerHTML to include the main title, phase, and the new hover-char span
+                        square.innerHTML = `
+                            ${item.display_title}
+                            <span class="hover-char oh-font">${hoverChar}</span>
+                        `;
+                            // <span class="phase">${phaseText}</span>
+
                         gridContainer.appendChild(square);
                     });
 
@@ -895,7 +979,9 @@
                     } else {
                         // 1. Add the successful report to history
                         reportHistory.push({
-                            report_title: data.report_title,
+                            input_word: data.input_word,
+                            input_translation: data.input_translation,
+                            input_parts: data.input_parts,
                             status: data.status,
                             detail: data.detail,
                             color_code: data.color_code,
