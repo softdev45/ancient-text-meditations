@@ -157,6 +157,74 @@ def process_word():
 
     return jsonify(result), 200 # Returns HTTP 200 success code
 
+@app.route('/api/command', methods=['POST'])
+def process_command():
+    """
+    API endpoint to receive the composed word string via POST and return a custom report.
+    """
+    try:
+        data = request.get_json()
+        command = data.get('command', '').strip()
+    except Exception:
+        command = '' # Treat as empty if parsing fails
+        
+    print(f"Received command for processing: {command}")
+    
+    # Simulate longer processing time for analysisכ
+    # time.sleep(random.uniform(1.0, 2.5)) 
+
+    # --- Processing Logic ---
+    # parts = composed_word.split(' ') if composed_word else []
+    # num_parts = len(parts)
+    
+    
+    # if num_parts == 0:
+    #     return jsonify({
+    #         "report_title": "Processing Error",
+    #         "status": "Failed",
+    #         "color_code": "#dc2626", # Red
+    #         "detail": "No valid tiles were submitted to form a word."
+    #     }), 400
+
+    # from nav import get_translation
+    
+    # start_time = time.time()
+    # # ext_res = trigger_request(get_translation(parts))
+    # ext_res = trigger_request(','.join(parts))
+    # import json
+    # # ext_res = json.load(ext_res)
+    # print(ext_res)
+
+    # total_time = round(time.time() - start_time,3)
+    # print(ext_res)
+    # status_message = "N/A"
+    # color = "#ccccc"
+
+    # translated = get_translation(parts)
+    # words_transl = list(zip(parts, translated))
+    # print(words_transl)
+
+    # input_mapped = list(map(lambda elem: elem[0] + f"({elem[1]}) ", words_transl))
+
+    loc = list(map( lambda el: int(el), command.split(':')))
+
+    verses = VB.query_ref(loc)
+
+
+    result = {
+        "title": f"{composed_word}: ({get_translation(parts)})",
+        "input_parts": parts,
+        # "parts_translation": translated,
+        "input_word": f"{' '.join(input_mapped)}",
+        "input_translation": translated,
+        "color_code": color,
+        "detail": ext_res,
+        # "load_time_ms": total_time
+    }
+    print('dbg:', result)
+
+    return jsonify(result), 200 # Returns HTTP 200 success code
+
 # --- Server Run Command ---
 if __name__ == '__main__':
     print("----------------------------------------------------------------")

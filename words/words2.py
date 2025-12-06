@@ -123,7 +123,7 @@ class Word:
         return f'{self.root}\t\t{self.word}\t\t{self.en}\t\t{self.ctx_en}\t\t{self.book}:{self.chapter}:{self.verse}\t\t{len(Word.wrd_loc[self.word])}\t\t{len(Word.rt_loc[self.root])} {self.get_next_loc()}\t\t\t{self.pronounce}'
     
     def __repr__(self):
-        return f'{self.word}[{self.root}]({self.en}/{self.ctx_en})@{self.get_location()}'
+        return f'({self.word})[{self.root}]({self.en}/{self.ctx_en})@{self.get_location()}'
 
     def repr2(self):
         return f"({self.word}/{self.root})/[{self.ctx_en}/{self.en}]"

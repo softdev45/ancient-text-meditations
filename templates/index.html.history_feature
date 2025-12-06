@@ -16,8 +16,8 @@
 
 	@font-face {
 		font-family: 'OHFont'; /* This is the name you will use in your CSS */
-		src: url('fonts/OHfont.ttf') format('ttf'), /* Modern browsers */
-		url('fonts/OHfont.woff') format('ttf');   /* Older browsers */
+		src: url({{ url_for('static', filename='fonts/OHfont.ttf') }}) format('ttf'), /* Modern browsers */
+		url({{ url_for('static', filename='fonts/OHfont.ttf') }}) format('ttf');   /* Older browsers */
 	font-weight: normal; /* Define the weight (e.g., normal, bold, 400, 700) */
 	font-style: normal;  /* Define the style (e.g., normal, italic) */
 	}
@@ -50,6 +50,20 @@
             margin: 0;
             font-size: 0.9rem;
             opacity: 0.8;
+        }
+
+        /* COMMAND CONTROL */
+        .command-input-container {
+            padding-bottom: 10px;
+
+        }
+
+        .command-input {
+            width: 500px;
+            font-size: 1.5rem;
+            font-family: 'OHFont';
+            font-weight: 500;
+            padding: 5px;
         }
         
         /* --- Main Content Container (for Centering Components) --- */
@@ -439,11 +453,15 @@
     <!-- NEW: Thin, Dark Header Panel -->
     <div class="header-panel">
 	    <!--<h1>Adaptive Interactive word-based insight tool</h1>-->
-        <h1>Meditation on the Old Prophets tool</h1>
+        <h1>Meditation on the Ancient Scrolls tool</h1>
         <p>Click tiles to compose a sequence, then click "Send" to receive verses to meditate.</p>
     </div>
     
     <div class="main-content-container">
+
+        <div class="command-input-container oh-font" id="command-control">
+            <input class="command-input" id="command-input"/>
+        </div>
 
         <div class="grid-container" id="square-grid">
             <p style="grid-column: 1 / -1; align-self: center;" class="message">Loading grid content from server...</p>
@@ -491,6 +509,7 @@
             // const API_BASE = 'http://127.0.0.1:5000/api/';
             const GRID_CONTENT_URL = API_BASE + 'grid-content';
             const PROCESS_WORD_URL = API_BASE + 'process-word'; // POST endpoint
+            const COMMAND_URL = API_BASE + 'command'; // POST endpoint
             const LOC_URL = API_BASE + 'location'; // POST endpoint
 
             // State
@@ -986,7 +1005,8 @@
                             detail: data.detail,
                             color_code: data.color_code,
                             load_time_ms: data.load_time_ms,
-                            timestamp: Date.now()
+                            timestamp: Date.now(),
+                            type: 'ancient_text'
                         });
 
                         // 2. Render the updated history (newest on top)
@@ -1004,6 +1024,66 @@
                 } finally {
                     setProcessingState(false);
                     updateWordDisplay();
+                }
+            }
+
+            async function processCommandResult(cResult){
+
+                return;
+                        reportHistory.push({
+                            input_word: data.input_word,
+                            input_translation: data.input_translation,
+                            input_parts: data.input_parts,
+                            status: data.status,
+                            detail: data.detail,
+                            color_code: data.color_code,
+                            load_time_ms: data.load_time_ms,
+                            timestamp: Date.now(),
+                            type: 'ancient_text'
+                        });
+            }
+
+            async function sendCommand(command) {
+                if (command.length === 0 || isProcessing) return;
+
+                setProcessingState(true);
+                
+                contentDisplay.innerHTML = `<p class="message">Sending command...</p>`;
+
+                // const wordString = composedWord.map(tile => tile.title).join(' ');
+
+                try {
+                    const response = await fetch(COMMAND_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ command: command })
+                    });
+                    
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        renderError(data.detail || data.message || `Server responded with status ${response.status}.`);
+                    } else {
+                        processCommandResult(data);
+                        // 1. Add the successful report to history
+
+                        // 2. Render the updated history (newest on top)
+                        renderHistory();
+                        
+                        // 3. Clear the sequence and temporary visual state
+                        // resetSequenceState();
+                        
+                        // 4. Clear permanent usage counts (saturation)
+                        // clearAllUsageCounts(); 
+                    }
+                } catch (error) {
+                    console.error('Analysis Request Error:', error);
+                    renderError(`Could not connect to the analysis endpoint. (${error.message})`);
+                } finally {
+                    setProcessingState(false);
+                    // updateWordDisplay();
                 }
             }
 
@@ -1070,6 +1150,57 @@
             // Start the initial load process
             loadInitialGrid();
         });
+
+            // Keyboard
+
+            document.addEventListener('keydown', function (event) {
+                // Check if the pressed key is the tilde (~) key.
+                // The key value might be '~' or '`' depending on keyboard layout.
+                if (event.key === '~' || event.key === '`') {
+                    // Prevent default action to avoid issues, e.g., if ~ is part of a browser shortcut.
+                    event.preventDefault();
+
+                    // Get the element to toggle. Replace 'your-element-id' with the actual ID of your element.
+                    const targetElement = document.getElementById('command-control');
+                    const commandInput = document.getElementById('command-input');
+
+                    if (targetElement) {
+                        // Toggle the display style property
+                        if (targetElement.style.display === 'none') {
+                            targetElement.style.display = 'block'; // Or 'flex', 'inline-block', etc., depending on desired layout
+                        } else {
+                            targetElement.style.display = 'none';
+                        }
+                    } else {
+                        console.warn("Element with ID 'your-element-id' not found.");
+                    }
+                    commandInput.focus();
+                }
+            });
+
+                const targetElement = document.getElementById('command-control');
+
+                if (targetElement) {
+                    targetElement.addEventListener('keydown', function (event) {
+                        // Check for Ctrl key and Enter key
+                        if (event.ctrlKey && event.key === 'Enter') {
+                            // Prevent the default action (e.g., new line in a textarea)
+                            event.preventDefault();
+
+                            // --- Your custom action goes here ---
+                            console.log("Ctrl+Enter pressed on the element with ID 'your-element-id'!");
+                            // For example, if it's a textarea, you might want to submit a form:
+                            // document.getElementById('your-form-id').submit();
+                            // Or trigger another function:
+                            // performMyAction();
+                            // ------------------------------------
+                            event.target.value = '';
+                        }
+                    });
+                } else {
+                    console.warn("Element with ID 'your-element-id' not found for Ctrl+Enter binding.");
+                }
+
     </script>
 </body>
 </html>
