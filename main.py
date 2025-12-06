@@ -212,13 +212,15 @@ def process_command():
 
 
     result = {
-        "title": f"{composed_word}: ({get_translation(parts)})",
-        "input_parts": parts,
+        # "title": f"{composed_word}: ({get_translation(parts)})",
+        "ref": loc,
+        "verses": verses
+        # "input_parts": parts,
         # "parts_translation": translated,
-        "input_word": f"{' '.join(input_mapped)}",
-        "input_translation": translated,
-        "color_code": color,
-        "detail": ext_res,
+        # "input_word": f"{' '.join(input_mapped)}",
+        # "input_translation": translated,
+        # "color_code": color,
+        # "detail": ext_res,
         # "load_time_ms": total_time
     }
     print('dbg:', result)

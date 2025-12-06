@@ -17,7 +17,7 @@
 	@font-face {
 		font-family: 'OHFont'; /* This is the name you will use in your CSS */
 		src: url({{ url_for('static', filename='fonts/OHfont.ttf') }}) format('ttf'), /* Modern browsers */
-		url({{ url_for('static', filename='fonts/OHfont.ttf') }}) format('ttf');   /* Older browsers */
+		url({{ url_for('static', filename='fonts/OHfont.woff') }}) format('woff');   /* Older browsers */
 	font-weight: normal; /* Define the weight (e.g., normal, bold, 400, 700) */
 	font-style: normal;  /* Define the style (e.g., normal, italic) */
 	}
@@ -836,7 +836,46 @@
 
                 return container;
             }
-            
+
+            function createRefReportCard(report, card, title){ 
+                v = document.createElement('div')
+                v.innerText = report.verses
+                label = document.createElement('span')
+                label = report.loc
+                title.appendChild(label)
+
+                card.appendChild(v)
+
+            }
+
+            function createWordReportCard(report, card, title) {
+                report.input_parts.forEach((elem, index) => {
+                    const part = document.createElement('span')
+                    const symbol = document.createElement('span')
+                    part.innerHTML = ` ${elem} `
+                    symbol.classList.add('large-font')
+                    symbol.innerHTML = `${report.input_translation[index]}`
+                    title.appendChild(part)
+                    title.appendChild(symbol)
+                })
+
+
+                // Full content HTML structure
+                card.appendChild(title);
+
+                card.innerHTML += `
+                            <p><small>[Processing time: ${report.load_time_ms}ms]</small></p>
+                        `;
+                // removed ^^^
+                // <h2>${report.input_word}: <span class="large-font">${report.input_translation}</span></h2>
+                // <p><strong>Status:</strong> <span style="color: ${report.color_code}; font-weight: bold;">${report.status}</span></p>
+                // <p>${report.detail}</p>
+
+                for (let j = 0; j < report['detail']['related'].length; j++) {
+                    card.appendChild(createWordEntry(report['detail']['related'][j]));
+                }
+            }
+
             // NEW FUNCTION: Renders the entire history of reports
             function renderHistory() {
                 if (reportHistory.length === 0) {
@@ -856,35 +895,17 @@
                     
                     const card = document.createElement('div');
                     card.classList.add('report-card', 'oh-font', 'large-font');
-                    card.style.borderLeftColor = report.color_code;
+                    card.style.borderLeftColor = "gray";//report.color_code;
 
                     const title = document.createElement('span')
 
-                    report.input_parts.forEach((elem,index) => {
-                        const part = document.createElement('span')
-                        const symbol = document.createElement('span')
-                        part.innerHTML = ` ${elem} `
-                        symbol.classList.add('large-font')
-                        symbol.innerHTML = `${report.input_translation[index]}`
-                        title.appendChild(part)
-                        title.appendChild(symbol)
-                    })
+                    if (report.type == 'ref') {
+                        createRefReportCard(report, card, title);
 
-                    
-                    // Full content HTML structure
-                    card.appendChild(title);
-
-                    card.innerHTML += `
-                        <p><small>[Processing time: ${report.load_time_ms}ms]</small></p>
-                    `;
-                        // removed ^^^
-                        // <h2>${report.input_word}: <span class="large-font">${report.input_translation}</span></h2>
-                        // <p><strong>Status:</strong> <span style="color: ${report.color_code}; font-weight: bold;">${report.status}</span></p>
-                        // <p>${report.detail}</p>
-                    
-                    for (let j = 0; j < report['detail']['related'].length; j++){
-                        card.appendChild(createWordEntry(report['detail']['related'][j]));
+                    } else {
+                        createWordReportCard(report,card, title);
                     }
+
 
                     if (isLatest) {
                         // Display the latest report in full
@@ -1027,19 +1048,14 @@
                 }
             }
 
-            async function processCommandResult(cResult){
+            async function processCommandResult(data){
 
                 return;
                         reportHistory.push({
-                            input_word: data.input_word,
-                            input_translation: data.input_translation,
-                            input_parts: data.input_parts,
-                            status: data.status,
-                            detail: data.detail,
-                            color_code: data.color_code,
-                            load_time_ms: data.load_time_ms,
+                            loc: data.loc,
+                            verses: data.verses,
                             timestamp: Date.now(),
-                            type: 'ancient_text'
+                            type: 'ref'
                         });
             }
 
@@ -1149,7 +1165,8 @@
 
             // Start the initial load process
             loadInitialGrid();
-        });
+
+
 
             // Keyboard
 
@@ -1194,12 +1211,16 @@
                             // Or trigger another function:
                             // performMyAction();
                             // ------------------------------------
+                            sendCommand(event.target.value)
                             event.target.value = '';
                         }
                     });
                 } else {
                     console.warn("Element with ID 'your-element-id' not found for Ctrl+Enter binding.");
                 }
+
+        });
+
 
     </script>
 </body>
