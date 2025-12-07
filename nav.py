@@ -17,10 +17,15 @@ def get_translation(wordlist : list):
 	result = list(map(lambda el: keys.index(el), result))
 	print(result)
 	result = list(map(lambda i_el: chars[i_el[1]][0] if
-				 (print(i_el,chars[i_el[1]],len(chars[i_el[1]]),i_el[0]+1 < len(result)) or True ) 
-				 and (i_el[0]+1 < len(result) or len(chars[i_el[1]])<2)
+				 (print(i_el,chars[i_el[1]],len(chars[i_el[1]]),i_el[0] > 0 or len(chars[i_el[1]])==1) or True ) 
+				 and (i_el[0] > 0  or len(chars[i_el[1]])==1)
 				#  and (i_el[0]+1 < len(result) or len(chars[i_el[1]])<2)
 				 else chars[i_el[1]][1], enumerate(result))) # add sofit for last letter
+	# result = list(map(lambda i_el: chars[i_el[1]][0] if
+	# 			 (print(i_el,chars[i_el[1]],len(chars[i_el[1]]),i_el[0]+1 < len(result)) or True ) 
+	# 			 and (i_el[0]+1 < len(result) or len(chars[i_el[1]])<2)
+	# 			#  and (i_el[0]+1 < len(result) or len(chars[i_el[1]])<2)
+	# 			 else chars[i_el[1]][1], enumerate(result))) # add sofit for last letter
 	result.reverse()
 	print(result)
 	result = ''.join(result)

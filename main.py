@@ -138,7 +138,9 @@ def process_word():
     color = "#ccccc"
 
     translated = get_translation(parts)
-    words_transl = list(zip(parts, translated))
+    print(parts)
+    print(translated)
+    words_transl = list(zip(parts[::-1], translated[::-1]))
     print(words_transl)
 
     input_mapped = list(map(lambda elem: elem[0] + f"({elem[1]}) ", words_transl))
@@ -206,14 +208,18 @@ def process_command():
 
     # input_mapped = list(map(lambda elem: elem[0] + f"({elem[1]}) ", words_transl))
 
-    loc = list(map( lambda el: int(el), command.split(':')))
+    if '@' in command:
+        loc = list(map( lambda el: int(el) if el.isdigit() else str(el), command[1:].split(':')))
+        verses = VB.query_ref(loc)
+    elif '#' in command:
+        verses = VB.query_word(command[1:])
+    
 
-    verses = VB.query_ref(loc)
 
 
     result = {
         # "title": f"{composed_word}: ({get_translation(parts)})",
-        "ref": loc,
+        "ref": command,
         "verses": verses
         # "input_parts": parts,
         # "parts_translation": translated,

@@ -460,7 +460,7 @@
     <div class="main-content-container">
 
         <div class="command-input-container oh-font" id="command-control">
-            <input class="command-input" id="command-input"/>
+            <input class="command-input" id="command-input" value="@GEN:1:1"/>
         </div>
 
         <div class="grid-container" id="square-grid">
@@ -505,8 +505,8 @@
             const sequenceLimitDisplay = document.getElementById('sequence-limit-display');
             
             // --- API Endpoints ---
-            const API_BASE = 'https://ancient-text-meditations.onrender.com/api/';
-            // const API_BASE = 'http://127.0.0.1:5000/api/';
+            // const API_BASE = 'https://ancient-text-meditations.onrender.com/api/';
+            const API_BASE = 'http://127.0.0.1:5000/api/';
             const GRID_CONTENT_URL = API_BASE + 'grid-content';
             const PROCESS_WORD_URL = API_BASE + 'process-word'; // POST endpoint
             const COMMAND_URL = API_BASE + 'command'; // POST endpoint
@@ -838,13 +838,25 @@
             }
 
             function createRefReportCard(report, card, title){ 
-                v = document.createElement('div')
-                v.innerText = report.verses
-                label = document.createElement('span')
-                label = report.loc
-                title.appendChild(label)
+                wordSearchResults = document.createElement('div')
+                console.log('v:')
+                console.log(report.verses)
+                report.verses.forEach((verse) => {
+                    console.log(verse);
+                    console.log(`${verse.book}`)
+                    verseNode = document.createElement('div')
+                    verseNode.innerHTML = `${verse.book}:${verse.chapter}:${verse.verse}: ${verse.text}` ;
+                    // console.log(Object.keys(verse))
+                    wordSearchResults.appendChild(verseNode)
 
-                card.appendChild(v)
+                })
+                label = document.createElement('span')
+                // label.innerHTML = report.loc
+                label.innerHTML = report.ref
+                title.appendChild(label)
+                card.appendChild(title)
+
+                card.appendChild(wordSearchResults)
 
             }
 
@@ -890,7 +902,7 @@
                     const report = reportHistory[i];
                     const isLatest = (i === reportHistory.length - 1);
                     
-                    console.log(report);
+                    console.log('report: ', report);
                     
                     
                     const card = document.createElement('div');
@@ -898,12 +910,18 @@
                     card.style.borderLeftColor = "gray";//report.color_code;
 
                     const title = document.createElement('span')
+                    console.log('rep keys:', Object.keys(report))
+                    if( report.type =='ref') {
+                        console.log('rep keys verses:', Object.keys(report.verses[0]))
+                    }
+                    else{
+                        console.log('rep keys detail:', Object.keys(report.detail))
+                    } 
 
                     if (report.type == 'ref') {
                         createRefReportCard(report, card, title);
-
                     } else {
-                        createWordReportCard(report,card, title);
+                        createWordReportCard(report, card, title);
                     }
 
 
@@ -918,6 +936,8 @@
                         const details = document.createElement('details');
                         const summary = document.createElement('summary');
                         summary.textContent = `Report: ${report.input_word}`;// | Status: ${report.status}`;
+                        if (report.type == 'ref')
+                            summary.textContent = `Report: ${report.ref}`;// | Status: ${report.status}`;
                         summary.classList.add('oh-font', 'large-font')
                         
                         details.appendChild(summary);
@@ -1050,9 +1070,9 @@
 
             async function processCommandResult(data){
 
-                return;
+                // return;
                         reportHistory.push({
-                            loc: data.loc,
+                            ref: data.ref,
                             verses: data.verses,
                             timestamp: Date.now(),
                             type: 'ref'
@@ -1082,7 +1102,13 @@
                     if (!response.ok) {
                         renderError(data.detail || data.message || `Server responded with status ${response.status}.`);
                     } else {
-                        processCommandResult(data);
+                        // await processCommandResult(data);
+                        reportHistory.push({
+                            ref: data.ref,
+                            verses: data.verses,
+                            timestamp: Date.now(),
+                            type: 'ref'
+                        });
                         // 1. Add the successful report to history
 
                         // 2. Render the updated history (newest on top)
@@ -1212,7 +1238,7 @@
                             // performMyAction();
                             // ------------------------------------
                             sendCommand(event.target.value)
-                            event.target.value = '';
+                            // event.target.value = '';
                         }
                     });
                 } else {

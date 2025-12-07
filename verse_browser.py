@@ -1,6 +1,6 @@
 import re
 from lxml import etree
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 #import numpy as np
 
@@ -10,6 +10,11 @@ class Verse:
     book: str
     chapter: int
     verse: int
+
+    # def __repr__(self):
+    #     return f"{self.book}:{self.chapter}:{self.verse} {self.text}"
+    # def __str__(self):
+    #     return f"{self.book}:{self.chapter}:{self.verse} {self.text}"
 
 class VerseBrowser():
 
@@ -24,6 +29,8 @@ class VerseBrowser():
         self.xml_tree = etree.parse(self.filepath)
         verses = self.xml_tree.xpath('//seg')
         self.verses = list(map(lambda v: Verse(v.text.strip(), *v.attrib['id'].split('.')[1:]), verses )) #extract id
+        print(self.verses[:10])
+        print(type(self.verses[0].chapter))
 
     def query(self, query):
         ptrn = re.compile(rf"{query}")
@@ -31,8 +38,20 @@ class VerseBrowser():
         return result
     
     def query_ref(self, ref):
-        self.last_ref_query_result = result = [ v for v in self.verses if ref == [v.book,v.chapter,v.verse] ]
-        return result[0]
+        ref = list(map( lambda e: str(e), ref))
+        print(ref)
+        result = [ asdict(v) for v in self.verses if ref[0] == v.book and ref[1] == v.chapter and ref[2] == v.verse ]
+        self.last_ref_query_result = result 
+        print(result)
+        return result
+    
+    def query_word(self, word):
+        print(word)
+        result = [ asdict(v) for v in self.verses if word.lower() in v.text.lower()]
+        self.last_word_query_result = result 
+        print(result)
+        return result
+
 
         
                 
