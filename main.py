@@ -79,7 +79,7 @@ def location():
     loc = loc.split(',')
     loc.remove(loc[1])
     result = VB.query_ref(loc)
-    return jsonify(f"{result.text}")
+    return jsonify(result)
 
 # --- Endpoint 2: Detailed Click Data (Process Word) ---
 @app.route('/api/process-word', methods=['POST'])
