@@ -1,3 +1,4 @@
+-e git+ssh://git@github.com/softdev45/ancient-text-meditations.git@restructure#egg=ancient_texts
 ansiwrap==0.8.4
 blinker==1.9.0
 certifi==2025.11.12
