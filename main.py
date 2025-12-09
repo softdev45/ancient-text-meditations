@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, session
-from nav import get_nav_data
+from ancient_texts.core import get_nav_data
 
-from use_text_query import trigger_request, get_verse, get_greek
+from .use_text_query import trigger_request, get_verse, get_greek
 import time
 
 app = Flask(__name__)
@@ -18,13 +18,13 @@ from flask_cors import CORS
 import time
 import random
 
-from verse_browser import VerseBrowser
-from func_tools import gen_book_map
+from .verse_browser import VerseBrowser
+from .func_tools import gen_book_map
 
 VB = VerseBrowser('./bible_en.xml')
 book_map = gen_book_map()
 
-from heb_char import h_rev
+from ancient_texts.heb_char import h_rev
 
 # Initialize the Flask app
 # app = Flask(__name__)
@@ -123,7 +123,7 @@ def process_word():
     #     status_message = "Complex Sequence"
     #     detail_msg = f"Long sequence of {num_parts} parts received. Requires extensive computation."
     #     color = "#3b82f6" # Blue
-    from nav import get_translation
+    from ancient_texts.core import get_translation
     
     start_time = time.time()
     # ext_res = trigger_request(get_translation(parts))

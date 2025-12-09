@@ -4,8 +4,9 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 from text_query import word_query,verse_query
-from func_tools import filter_by
+from tools.func_tools import filter_by
 
+from ancient_texts.core import get_translation
 
 @app.route('/verse',methods=['GET'])
 def get_verse():
@@ -47,7 +48,6 @@ def get_related_words():
     # In a real application, you would perform database lookup, NLP, etc., here.
     print(f"INPUT: {input_word}")
     input_seq = input_word.split(',')
-    from nav import get_translation
     input_seq = get_translation(input_seq)
     words = word_query(input_seq)
     print(words)

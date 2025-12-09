@@ -37,14 +37,21 @@ def word_query(word: str):
 
 	if len(result) < 5 or True:
 		print('browsing in root_agreg - slicing closest')
+		import time
+		# st = time.time()
+		words_aggreg = list(Word.word_agreg.items())+list(Word.root_agreg.items())
+		# print(time.time() - st)
+		# words_aggreg = list(Word.word_agreg.items())+list(Word.root_agreg.items())
+		# print(time.time() - st)
+
 		sub_string_result = []
-		found = list(reversed(sorted([(pylcs.lcs_string_length(word,key),val,key) for key,val in list(Word.word_agreg.items())+list(Word.root_agreg.items()) ], key=lambda el:el[0])))
+		found = list(reversed(sorted([(pylcs.lcs_string_length(word,key),val,key) for key,val in words_aggreg ], key=lambda el:el[0])))
 		max_len,_1,_2 = found[0]
 		found = [el for el in found if el[0] == max_len and len(el[1])>0 ]
 		max_len_str = max_len
 		print('string', found)
 		# try browsing with longest common sequence
-		found = list(reversed(sorted([(pylcs.lcs_sequence_length(word,key),val,key) for key,val in list(Word.word_agreg.items())+list(Word.word_agreg.items()) ], key=lambda el:el[0])))
+		found = list(reversed(sorted([(pylcs.lcs_sequence_length(word,key),val,key) for key,val in words_aggreg ], key=lambda el:el[0])))
 		max_len,_1,_2 = found[0]
 		if not max_len > max_len_str: 
 			result.extend(sub_string_result) #add prev results if subseq is not longer (L-Q word formation)

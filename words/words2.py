@@ -1,5 +1,5 @@
 from main2 import only_letters
-from func_tools import gen_book_map
+from tools.func_tools import gen_book_map
 
 import main2 as main
 import re
@@ -153,8 +153,8 @@ def print_rows(rows):
 
 
 def load(wdb=None):
-    import traceback
-    traceback.print_stack()
+    # import traceback
+    # traceback.print_stack()
     #global db
     if not wdb and not Word.db:
         wdb = main.load_new('./new2_db_100k.csv')

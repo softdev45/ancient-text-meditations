@@ -902,7 +902,11 @@
                 // <p>${report.detail}</p>
 
                 for (let j = 0; j < report['detail']['related'].length; j++) {
-                    card.appendChild(createWordEntry(report['detail']['related'][j]));
+                    const reportEntry = createWordEntry(report['detail']['related'][j])
+                    const num = document.createElement('span')
+                    num.innerText = `${j+1}. `
+                    reportEntry.insertBefore(num, reportEntry.firstChild)
+                    card.appendChild(reportEntry);
                 }
             }
 
