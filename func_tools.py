@@ -80,6 +80,8 @@ def files_in(path):
             full_path = os.path.join(path, file_path)
             if os.path.isfile(full_path):
                 files.append(full_path)
+            elif os.path.isdir(full_path):
+                files.append(files_in(full_path))
     except:
         print('could not load from: ', path)
     return files

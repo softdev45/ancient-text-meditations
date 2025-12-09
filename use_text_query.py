@@ -1,4 +1,5 @@
 import requests
+from greek_gospel import *
 
 
 from flask import Flask, jsonify, request
@@ -6,6 +7,17 @@ from flask import Flask, jsonify, request
 # The target URL for the server's endpoint
 SERVER_ENDPOINT_WORD = "http://127.0.0.1:5001/related_words"
 SERVER_ENDPOINT_VERSE = "http://127.0.0.1:5001/verse"
+
+lib = None
+
+def get_greek(ref):
+    global lib
+    if not lib:
+        lib = build_books_lib()
+    return lib.search(ref)
+
+
+
 
 def get_verse(ref):
     # payload = {

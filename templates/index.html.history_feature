@@ -505,8 +505,8 @@
             const sequenceLimitDisplay = document.getElementById('sequence-limit-display');
             
             // --- API Endpoints ---
-            const API_BASE = 'https://ancient-text-meditations.onrender.com/api/';
-            // const API_BASE = 'http://127.0.0.1:5000/api/';
+            // const API_BASE = 'https://ancient-text-meditations.onrender.com/api/';
+            const API_BASE = 'http://127.0.0.1:5000/api/';
             const GRID_CONTENT_URL = API_BASE + 'grid-content';
             const PROCESS_WORD_URL = API_BASE + 'process-word'; // POST endpoint
             const COMMAND_URL = API_BASE + 'command'; // POST endpoint
@@ -708,7 +708,7 @@
                         get_verse_interlinear.addEventListener('click', async () => {
                             try {
                                 // --- 2. Query Server for Data ---
-                                const response = await fetch(LOC_URL + `?loc=${encodeURIComponent(loc)}&int=true`);
+                                const response = await fetch(LOC_URL + `?loc=${encodeURIComponent(loc)}&type=inter`);
 
                                 if (!response.ok) {
                                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -844,11 +844,27 @@
                 console.log(report.verses)
                 report.verses.forEach((verse) => {
                     console.log(verse);
-                    console.log(`${verse.book}`)
-                    verseNode = document.createElement('div')
-                    verseNode.innerHTML = `${verse.book}:${verse.chapter}:${verse.verse}: ${verse.text}` ;
-                    // console.log(Object.keys(verse))
-                    wordSearchResults.appendChild(verseNode)
+                    if (Array.isArray(verse)){
+                        verse.forEach((v) => {
+                            console.log(v)
+                            verseNode = document.createElement('div')
+                            verseNode.innerHTML =` ${v.eng} [${v.greek}/${v.transliter}]`;
+                            // console.log(Object.keys(verse))
+                            wordSearchResults.appendChild(verseNode)
+
+                        })
+                    } else {
+
+                        console.log(`${verse.book}`)
+                        verseNode = document.createElement('div')
+                        verseNode.innerHTML = `${verse.book}:${verse.chapter}:${verse.verse}: ${verse.text}`;
+                        // console.log(Object.keys(verse))
+                        wordSearchResults.appendChild(verseNode)
+                    }
+
+                            sepNode = document.createElement('div')
+                            sepNode.innerHTML = '--------------';
+                            wordSearchResults.appendChild(sepNode)
 
                 })
                 label = document.createElement('span')
@@ -912,12 +928,12 @@
 
                     const title = document.createElement('span')
                     console.log('rep keys:', Object.keys(report))
-                    if( report.type =='ref') {
-                        console.log('rep keys verses:', Object.keys(report.verses[0]))
-                    }
-                    else{
-                        console.log('rep keys detail:', Object.keys(report.detail))
-                    } 
+                    // if( report.type =='ref') {
+                    //     console.log('rep keys verses:', Object.keys(report.verses[0]))
+                    // }
+                    // else{
+                    //     console.log('rep keys detail:', Object.keys(report.detail))
+                    // } 
 
                     if (report.type == 'ref') {
                         createRefReportCard(report, card, title);

@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, session
 from nav import get_nav_data
 
-from use_text_query import trigger_request, get_verse
+from use_text_query import trigger_request, get_verse, get_greek
 import time
 
 app = Flask(__name__)
@@ -68,11 +68,11 @@ def get_grid_content():
 @app.route('/api/location', methods=['GET'])
 def location():
     loc:list = request.args.get('loc')
-    interlinear:bool = bool(request.args.get('int', default=False))
+    verse_type:str = str(request.args.get('type', default=False))
 
-    print('getting loc:', loc, 'int=', interlinear)
+    print('getting loc:', loc, 'verse_type=', verse_type)
 
-    if interlinear:
+    if verse_type == 'inter':
         return jsonify(get_verse(loc))
 
 
@@ -171,6 +171,7 @@ def process_command():
         command = '' # Treat as empty if parsing fails
         
     print(f"Received command for processing: {command}")
+
     
     # Simulate longer processing time for analysisכ
     # time.sleep(random.uniform(1.0, 2.5)) 
@@ -213,6 +214,8 @@ def process_command():
         verses = VB.query_ref(loc)
     elif '#' in command:
         verses = VB.query_word(command[1:])
+    elif '$' in command:
+        verses = get_greek(command[1:])
     
 
 
