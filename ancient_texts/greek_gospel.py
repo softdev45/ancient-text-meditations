@@ -1,4 +1,4 @@
-from .func_tools import files_in
+from tools.func_tools import files_in
 from dataclasses import dataclass
 from json import load as json_load
 import itertools

@@ -1,5 +1,5 @@
 import requests
-from .greek_gospel import *
+from ancient_texts.greek_gospel import *
 
 
 from flask import Flask, jsonify, request

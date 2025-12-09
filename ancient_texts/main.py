@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, session
 from ancient_texts.core import get_nav_data
 
-from .use_text_query import trigger_request, get_verse, get_greek
+from ancient_texts.use_text_query import trigger_request, get_verse, get_greek
 import time
 
 app = Flask(__name__)
@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-	return render_template('index.html.history_feature')
+	return render_template('index.html')
 
 
 
@@ -18,8 +18,8 @@ from flask_cors import CORS
 import time
 import random
 
-from .verse_browser import VerseBrowser
-from .func_tools import gen_book_map
+from ancient_texts.verse_browser import VerseBrowser
+from tools.func_tools import gen_book_map
 
 VB = VerseBrowser('./bible_en.xml')
 book_map = gen_book_map()
