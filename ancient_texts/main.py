@@ -11,7 +11,7 @@ app = Flask(__name__)
 def index():
 	return render_template('index.html')
 
-
+#TODO query heb word by eng word
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
