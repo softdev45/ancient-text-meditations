@@ -1,4 +1,4 @@
-from words2 import Word
+from words.word import Word
 import Levenshtein as L
 #from thefuzz import fuzz
 import pylcs
@@ -13,6 +13,7 @@ def verse_query(ref: str):
 
 def word_query(word: str):
 	result = []
+	#TODO test for 6 3 5 (conn leg revel)
 	if word in Word.word_agreg:
 		print('found in word_agreg - slicing max 3')
 		result.append((None, Word.word_agreg[word][0:3], word)) # 3 words from the list

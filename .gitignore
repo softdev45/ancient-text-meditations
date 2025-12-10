@@ -1,0 +1,11 @@
+# Bytecode
+__pycache__/
+*.pyc
+
+unused/
+
+# Build Artifacts
+build/
+dist/
+# Python package metadata/build files
+*.egg-info/

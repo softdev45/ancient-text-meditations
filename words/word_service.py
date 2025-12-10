@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 # 1. Initialize the Flask application instance
 app = Flask(__name__)
 
-from text_query import word_query,verse_query
+from words.text_query import word_query,verse_query
 from tools.func_tools import filter_by
 
 from ancient_texts.core import get_translation

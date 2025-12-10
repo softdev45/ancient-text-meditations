@@ -1,7 +1,7 @@
-from main2 import only_letters
+from ancient_texts.helper_tools import only_letters, calc_word_count, load_new
 from tools.func_tools import gen_book_map
 
-import main2 as main
+# import main2 as main
 import re
 import prettytable
 
@@ -152,23 +152,23 @@ def print_rows(rows):
     print(len(rows))
 
 
-def load(wdb=None):
+def load():
     # import traceback
     # traceback.print_stack()
     #global db
-    if not wdb and not Word.db:
-        wdb = main.load_new('./new2_db_100k.csv')
+    if not Word.db:
+        wdb = load_new('./words/new2_db_100k.csv')
         # wdb = main.load_new('./new2_db.csv')
-    db = list(map(lambda w: Word(w), wdb))
-    Word.db = db
+        db = list(map(lambda w: Word(w), wdb))
+        Word.db = db
 
-    print_rows(db[:10]) 
+        print_rows(db[:10]) 
     #for w in db[:10]:
     #    print(w)
 
 def wcount():
     wl = list(map(lambda w: f'[{w.root}]', Word.db))
-    wc = main.calc_word_count(wl)
+    wc = calc_word_count(wl)
     wcs = sorted(wc.items(), key= lambda i: i[1])
     return wcs
 
@@ -223,12 +223,15 @@ def program():
         #menu.show()
 
 
-if __name__ == 'words2':
+if __name__ == 'words.word':
     #start()
-    print('loading words')
+    # import pathlib
+    # script_dir = pathlib.Path(__file__).parent.resolve()
+    # print(script_dir)
     if not Word.db:
+        print('loading words')
         load()
-    print('loaded words')
+        print('loaded words')
 
 def start():
     if not Word.db:
@@ -245,3 +248,5 @@ if __name__ == '__main__':
     #program()
     #load()
     start()
+
+print(__name__)
