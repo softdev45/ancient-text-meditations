@@ -216,6 +216,8 @@ def process_command():
         verses = VB.query_word(command[1:])
     elif '$' in command:
         verses = get_greek(command[1:])
+    # elif '%' in command:
+    #     verses 
     
 
 

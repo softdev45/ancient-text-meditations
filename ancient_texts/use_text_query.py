@@ -55,7 +55,7 @@ def get_verse(ref):
 
 
 # @app.route('/trigger_request/<word>', methods=['GET'])
-def trigger_request(word):
+def trigger_request(word, lang="ToC"):
     """
     This client endpoint makes a POST request to the separate Flask server.
     
@@ -66,7 +66,8 @@ def trigger_request(word):
     
     # 1. Define the JSON payload required by the server
     payload = {
-        "input_word": word
+        "input_word": word,
+        "lang": lang
     }
 
     # 2. Define the headers, specifying that the body is JSON

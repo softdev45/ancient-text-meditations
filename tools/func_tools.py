@@ -4,7 +4,7 @@ import timeit
 import datetime
 
 
-def filter_by(lst, key_fun):
+def unique_by(lst, key_fun):
     result = []
     already_in = set()
     for elem in lst:

@@ -35,28 +35,28 @@ def get_translation(wordlist : list):
 
 
 
-		
+#TODO viewing many meanings		
 
 nav_symbols = {
 	1:	['Leader', 'Love', 'Master', 'First', 'Strength'],
 	2:	['Tent', 'House', 'Temple', 'Community', 'Inside', 'Heart'],
 	3:	['Leg', 'Meditation', 'Prayer', 'Elavate', 'Rise'],
-	4:	['Way', 'Door', 'Lower', 'Truth'],
-	5:	['Word', 'Influence', 'Revelation'],
+	4:	['Way', 'Door', 'Lower', 'Attitude', 'Truth'],
+	5:	['Word', 'Influence', 'Revelation', 'Human', 'Spirit'],
 	6:	['Nail/Hook', 'Connection', 'Weakness', 'Join/Add'],
-	7:	['Plough', 'Make Ready', 'Overturn', 'Sword'],
-	8:	['Wall', 'Separate', 'Protect' ],
-	9:	['Basket', 'Container','Gather', 'Surround'],
+	7:	['Plough', 'Make Ready', 'Overturn', 'Sword', 'Tongue'],
+	8:	['Wall', 'Separate', 'Protect', 'End' ],
+	9:	['Basket', 'Container','Gather', 'Surround', 'Mistake', 'Recollection'],
 	10:	['Hand', 'Complete', 'Work', 'Power'],
-	20:	['Palms', 'Allow','Press', 'Tame'],
+	20:	['Palms', 'Allow','Press', 'Tame', 'Activate' ],
 	30:	['Staff', 'Control', 'Teach', 'Guide','Towards'],
 	40:	['Water', 'Chaos', 'Massive', 'Nourishment', 'Cleansing'],
-	50:	['Activity', 'Life', 'Continue'],
+	50:	['Activity', 'Life', 'Continue', 'Seed', 'Sprout'],
 	60:	['Support', 'Shield', 'Thorn' ],
 	70:	['Knowledge','Experience','Eye', 'Fountain'],
 	80:	['Opening', 'Mouth', 'Command'],
-	90:	['Desire', 'Righteous', 'Need', 'Hunt'],
-	100:	['Least', 'Sun', 'Revolutions', 'Light'],
+	90:	['Desire', 'Righteous', 'Need', 'Hunt', 'Rest'],
+	100:	['Least', 'Sun', 'Revolutions', 'Light', 'Again', 'Repeat'],
 	200:	['Head', 'Most High', 'Person'],
 	300:	['Teeth', 'Consume', 'Destroy', 'Face', 'Peak'],
 	400:	['Covenant', 'Seal', 'Mark', 'Last'],

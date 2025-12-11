@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 from words.text_query import word_query,verse_query
-from tools.func_tools import filter_by
+from tools.func_tools import unique_by
 
 from ancient_texts.core import get_translation
 
@@ -53,7 +53,7 @@ def get_related_words():
     print(words)
 
     #map to english translations
-    if len(words) == 1:
+    if False and len(words) == 1:
         print('only one match')
         words = words[0]
         for i in range(len(words[1])):
@@ -63,31 +63,23 @@ def get_related_words():
         # words = list(filter( lambda el: (print(el.split('/')) or True) and el.split('/')[2][0].islower(),  map(lambda el: el[1][0].repr2(), words))) #1-wordlist, 0-first; el -> (dist, [word-occur], 'word')
         # filter-out duplicates by root
         names_present = set()
-        # words_unique = []
-        # for word in words:
-        #     if word
-         
-        words = list(filter( lambda el: el.en[0].islower(),  map(lambda el: el[1][0], words))) #1-wordlist, 0-first; el -> (dist, [word-occur], 'word')
+
+        words =  list(map(lambda el: el[1][0], words)) #[1]-wordlist, [0]-first; el -> (dist, [word-occur], 'word')
+
+        if len(words) > 3:
+            words = list(filter( lambda el: el.en[0].islower(),  words))         
 
         # related_list = list(map( lambda wrd: wrd.en, words))
         #TODO
-        words = filter_by(words, lambda el: el.en)
+        words = unique_by(words, lambda el: el.en)
         def get_word(w):
-            print(w)
+            # print(w)
             result = {key: val for key,val in w.__dict__.items()  if key in ["word","root", "en", "ctx_en"]}
-            print(result)
+            # print(result)
             result.update({'loc': w.get_location(book_name=True), 'verse':w.get_verse()})
             return result
         # related_list = list(map( lambda wrd: wrd.get_data() + [wrd.get_verse(which='ctx')], words))
         related_list = list(map( lambda wrd: get_word(wrd), words))
-
-    # print(set(related_list))
-    # if input_word.lower() == "hello":
-    #     related_list = ["hi", "greetings", "hey", "salutations"]
-    # elif input_word.lower() == "flask":
-    #     related_list = ["python", "microservice", "web", "api"]
-    # else:
-    #     related_list = [f"{input_word}_A", f"{input_word}_B", f"{input_word}_C"]
 
     # 5. Return the result
     # jsonify serializes the Python dictionary into a JSON response.

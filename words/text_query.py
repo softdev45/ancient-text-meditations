@@ -13,14 +13,14 @@ def verse_query(ref: str):
 
 def word_query(word: str):
 	result = []
-	#TODO test for 6 3 5 (conn leg revel)
-	if word in Word.word_agreg:
-		print('found in word_agreg - slicing max 3')
-		result.append((None, Word.word_agreg[word][0:3], word)) # 3 words from the list
-		#TODO filter results (compact)
-	elif word in Word.root_agreg:
-		print('found in root_agreg - slicing max 3')
-		result.append((None, Word.root_agreg[word][0:3], word)) # 3 words from the list
+	#TODO test for 6 3 5 (conn leg revel) somewhat-FIXED 
+	# if word in Word.word_agreg:
+	# 	print('found in word_agreg - slicing max 3')
+	# 	result.append((None, Word.word_agreg[word][0:3], word)) # 3 words from the list
+	# 	#TODO filter results (compact)
+	# elif word in Word.root_agreg:
+	# 	print('found in root_agreg - slicing max 3')
+	# 	result.append((None, Word.root_agreg[word][0:3], word)) # 3 words from the list
 
 	
 
