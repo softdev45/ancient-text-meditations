@@ -140,7 +140,7 @@ def process_word():
     translated = get_translation(parts)
     print(parts)
     print(translated)
-    words_transl = list(zip(parts[::-1], translated[::-1]))
+    words_transl = list(zip(parts[::-1], translated[::1]))
     print(words_transl)
 
     input_mapped = list(map(lambda elem: elem[0] + f"({elem[1]}) ", words_transl))

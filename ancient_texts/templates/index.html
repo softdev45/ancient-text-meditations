@@ -696,7 +696,7 @@
             }
 
             function createLink(loc, parent=null) {
-                        console.log(loc)
+                        console.log('loc', loc)
                         const links = document.createElement('div')
                         links.classList.add('links-container')
                         const get_verse_link = document.createElement('div')
@@ -705,7 +705,8 @@
                         //     parent.appendChild(link);
                         // }
                         // get_verse_link.innerText = loc.map((el,ind)=> `(${el})` ? ind==1 : el).filter((el, ind) => ind != 1).join(':');
-                        get_verse_link.innerText = loc.map((el,ind)=> ind==1 ? `(${el})`  : el).join(':');
+                        loc_mod = loc.map((el,ind)=> ind==1 ? `(${el})`  : el)
+                        get_verse_link.innerText = loc_mod.join(':');
                         get_verse_link.classList.add('verse-ref-link-unclicked','verse-links')
 
                         get_verse_interlinear.innerText = "[load interlinear]"//loc.filter((el, ind) => ind != 1).join(':');
@@ -762,18 +763,20 @@
                                 const verseText = document.createElement('div');
                                 console.log(data)
                                 verseText.innerText = data[0].text;
-                                get_verse_link.appendChild(verseText); //link -< parent
+                                get_verse_link.appendChild(verseText); //linlinkk -< parent
 
                                     next = loc.slice()
                                     next[next.length-1] = Number(next.at(-1))+1
+                                    console.log(next)
                                     // prev = prev.join(',')
                                     // link.insertBefore(createLink(prev,true), result)
-                                    if (!hasChildWithInnerText(parent, next.join(',')))
+                                    if (!hasChildWithInnerText(parent, next.map((el,ind)=> ind==1 ? `(${el})`  : el).join(':')))
                                         parent.appendChild(createLink(next,parent))
 
                                     prev = loc.slice()
                                     prev[prev.length-1] = Number(prev.at(-1))-1
-                                    if (!hasChildWithInnerText(parent, prev.join(',')))
+                                    console.log(prev)
+                                    if (!hasChildWithInnerText(parent, prev.map((el,ind)=> ind==1 ? `(${el})`  : el).join(':')))
                                         parent.prepend(createLink(prev,parent))
 
                             } catch (error) {
