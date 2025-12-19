@@ -4,6 +4,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='fonts.css') }}" crossorigin="anonymous">
   <link rel="stylesheet" href="{{ url_for('static', filename='browshare.css') }}" crossorigin="anonymous">
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" /> -->
   <style>
   </style>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
@@ -20,7 +21,7 @@
   <nav>
 
   </nav>
-  <main>
+  <main class="swiper">
 
 
     <!-- <h2>Functions, Equations and Data Structures</h2> -->
@@ -33,6 +34,16 @@
 
     </div>
 
+    <div id="controls">
+      <button onclick="stepVerse(-1)" class="button-prev-verse">Previous Verse (or swipe)</button>
+      <div>
+        <button onclick="changeView(1)">Next Find</button>
+        <button onclick="changeView(-1)">Previous Find</button>
+      </div>
+      <button onclick="stepVerse(1)" button="button-next-verse">Next Verse</button>
+
+    </div>
+
     <div id="log-display">
 
     </div>
@@ -40,6 +51,43 @@
   </main>
   <script src="{{ url_for('static', filename='pagetools.js') }}" defer></script>
   <script src="{{ url_for('static', filename='browshare.js') }}" defer></script>
+  <!-- <script src="{{ url_for('static', filename='TinyGesture.min.js') }}" defer></script> -->
+   <!-- <script src="https://cdn.jsdelivr.net/npm/tinygesture@3.0.0/dist/TinyGesture.min.js"></script> -->
+  <script type="module">
+    import TinyGesture from 'https://cdn.jsdelivr.net/npm/tinygesture@3.0.0/dist/TinyGesture.min.js';
+    // import TinyGesture from 'tinygesture';
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const target = document.getElementsByClassName('swiper')[0];
+
+      // 2. Initialize TinyGesture
+      const gesture = new TinyGesture(target);
+
+      // 3. Listen for swipe events
+      gesture.on('swipeleft', () => {
+        console.log('Action fired: Swiped Left!');
+        stepVerse(1)
+      });
+
+      gesture.on('swiperight', () => {
+        stepVerse(-1)
+        console.log('Action fired: Swiped Right!');
+      });
+      gesture.on('swipeup', () => {
+        changeView(1)
+        console.log('Action fired: Swiped Right!');
+      });
+      gesture.on('swipedown', () => {
+        changeView(-1)
+        console.log('Action fired: Swiped Right!');
+      });
+
+      function yourCustomFunction() {
+        alert('Logic triggered without npm!');
+      }
+    })
+
+  </script>
 </body>
 
 </html>

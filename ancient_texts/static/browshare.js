@@ -6,6 +6,27 @@ const logDisplay = document.getElementById('log-display');
 const contentDisplay = document.getElementById('word');
 
 let contentHist = []
+let currentElem = 0
+let currentVerse = NaN
+let chapterData = new Map()
+
+function handleCommandResult(data) {
+  console.log(data)
+  if (data.command.startsWith('<>')) {
+    const current = contentHist[0].data[currentElem]
+    chapterData.set(current, data.result)
+    renderHistory()
+  } else {
+    contentHist.unshift({
+      data: data.result,
+      command: data.command,
+      // verses: data.verses,
+      // timestamp: Date.now(),
+      // type: 'ref'
+    })
+    currentVerse = data.result[0].verse;
+  }
+}
 
 
 async function sendCommand(command) {
@@ -32,12 +53,7 @@ async function sendCommand(command) {
       renderError(data.detail || data.message || `Server responded with status ${response.status}.`);
     } else {
       // await processCommandResult(data);
-      contentHist.push({
-        data: data,
-        // verses: data.verses,
-        // timestamp: Date.now(),
-        // type: 'ref'
-      });
+      handleCommandResult(data)
       // 1. Add the successful report to history
 
       // 2. Render the updated history (newest on top)
@@ -59,7 +75,25 @@ async function sendCommand(command) {
 }
 
 function createVerseElem(data) {
+  console.log(data)
   const verse = document.createElement('div')
+  const currentVerses = chapterData.get(contentHist[0].data[currentElem])
+
+  if (currentVerses) {
+    if (currentVerse > currentVerses.length) {
+      currentVerse = currentVerses.length
+    }
+    if (currentVerse <= 0) {
+      currentVerse = 1
+    }
+  }
+
+  if (currentVerse != data.verse && currentVerses) {
+    data = currentVerses[currentVerse - 1]
+  }
+
+  console.log(data)
+
 
   const ref = document.createElement('span')
   ref.innerText = `${data.book} ${data.chapter}:${data.verse}`
@@ -68,8 +102,8 @@ function createVerseElem(data) {
   text.classList.add('verse-text')
   text.innerText = data.text
 
-  verse.appendChild(text)
   verse.appendChild(ref)
+  verse.appendChild(text)
 
   return verse;
 
@@ -79,21 +113,53 @@ function renderHistory() {
 
   contentDisplay.replaceChildren()
 
-  for (let i = contentHist.length - 1; i >= 0; --i) {
-    const resultNode = document.createElement('div')
-    const data = contentHist[i].data
-    console.log(data)
-    data.slice(0, 3).forEach(element => {
-      const item = createVerseElem(element)
-      // item.innerText = JSON.stringify(element);
-      resultNode.appendChild(item)
-    });
-    contentDisplay.appendChild(resultNode)
+  // for (let i = contentHist.length - 1; i >= 0; --i) {
+  // if (!currentElem){
+  //   currentElem = contentHist.length -1;
+  // }
+  let i = 0 //currentElem;
 
-  }
+  const resultNode = document.createElement('div')
+  const data = contentHist[i].data
 
+  const title = document.createElement('div')
+  title.innerText = '#' + contentHist[i].command
+  resultNode.appendChild(title)
 
+  // console.log(data)
+  data.slice(currentElem, currentElem + 1).forEach(element => {
+    const item = createVerseElem(element)
+    // item.innerText = JSON.stringify(element);
+    resultNode.appendChild(item)
+  });
+  contentDisplay.appendChild(resultNode)
+
+  // }
 }
+
+function changeView(step = 0) {
+  if (step != 0) {
+    currentElem += step;
+    currentElem %= contentHist[0].data.length
+    if (currentElem < 0) currentElem = contentHist[0].data.length-1
+    currentVerse = contentHist[0].data[currentElem].verse
+    renderHistory()
+  }
+}
+
+
+function stepVerse(step) {
+  console.log(currentVerse)
+  current = contentHist[0].data[currentElem]
+  currentVerse += step
+  if (!chapterData.has(current)) {
+    sendCommand(`<>${current.book}:${current.chapter}`)
+  } else {
+    console.log(currentVerse)
+    renderHistory()
+  }
+}
+
 function renderError(message) {
   // Keep renderError separate as it displays a temporary, critical message
   logDisplay.innerHTML = `
@@ -128,6 +194,22 @@ document.addEventListener('keydown', function (event) {
     } else {
       console.warn("Element with ID 'your-element-id' not found.");
     }
+  }
+  if (event.key === "ArrowUp") {
+    event.preventDefault()
+    changeView(1)
+  }
+  if (event.key === "ArrowDown") {
+    event.preventDefault()
+    changeView(-1)
+  }
+  if (event.key === "ArrowLeft") {
+    event.preventDefault()
+    stepVerse(-1)
+  }
+  if (event.key === "ArrowRight") {
+    event.preventDefault()
+    stepVerse(1)
   }
 });
 

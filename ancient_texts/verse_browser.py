@@ -11,6 +11,12 @@ class Verse:
     chapter: int
     verse: int
 
+    def __init__(self, text, *args):
+        self.text = text
+        self.book = args[0]
+        self.chapter = int(args[1])
+        self.verse = int(args[2])
+
     # def __repr__(self):
     #     return f"{self.book}:{self.chapter}:{self.verse} {self.text}"
     # def __str__(self):
@@ -38,9 +44,10 @@ class VerseBrowser():
         return result
     
     def query_ref(self, ref):
-        ref = list(map( lambda e: str(e), ref))
+        # ref = list(map( lambda e: str(e), ref))
         print(ref)
-        result = [ asdict(v) for v in self.verses if ref[0] == v.book and ref[1] == v.chapter and ref[2] == v.verse ]
+        ref[1] = int(ref[1])
+        result = [ asdict(v) for v in self.verses if ref[0] == v.book and ref[1] == v.chapter and (len(ref)<=2 or ref[2] == v.verse) ]
         self.last_ref_query_result = result 
         print(result)
         return result

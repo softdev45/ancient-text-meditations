@@ -73,10 +73,29 @@
       font-size: 1rem ;
     }
 
+    #controls {
+      position: fixed;
+      bottom:0;
+      width: 100vw;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      height: 15%;
+    }
+
+    #controls > div {
+      display:grid;
+      grid-template-rows: 1fr 1fr;
+      /* flex-direction: column; */
+      /* flex: 1; */
+    }
+
     /* from html */
 
 
     body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
       margin: 0;
       font-family: 'Average-Regular';
       background-color: #f4f4f1;

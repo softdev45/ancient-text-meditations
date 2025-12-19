@@ -17,21 +17,21 @@ def browshare():
 
 @app.route('/api/browshare/cmd', methods=['POST'])
 def bs_cmd():
-    print(request.args.keys())
-    loc= request.args.get('cmd')
     data = request.get_json()
     print(data)
+
+    verses = []
+
     cmd = data['cmd']
-    # verse_type:str = str(request.args.get('type', default=False))
-
-    # print('getting loc:', loc, 'verse_type=', verse_type)
-
-    # if verse_type == 'inter':
-        # return jsonify(get_verse(loc))
-
-    # loc = loc.split(',')
-    # loc.remove(loc[1])
-    result = VB.query_word(cmd)
+    if cmd.startswith('<>'):
+        _cmd = cmd[2:].split(":")
+        verses = VB.query_ref(_cmd)
+    else:
+        verses = VB.query_word(cmd)
+    result = {
+        'result' : verses,
+        'command' : cmd
+    }
     return jsonify(result)
     
 
