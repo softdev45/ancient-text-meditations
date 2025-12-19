@@ -21,7 +21,7 @@
   <nav>
 
   </nav>
-  <main class="swiper">
+  <main class="">
 
 
     <!-- <h2>Functions, Equations and Data Structures</h2> -->
@@ -34,7 +34,7 @@
 
     </div>
 
-    <div id="controls">
+    <div id="controls" class="swiper">
       <button onclick="stepVerse(-1)" class="button-prev-verse">Previous Verse (or swipe)</button>
       <div>
         <button onclick="changeView(1)">Next Find</button>
@@ -52,7 +52,7 @@
   <script src="{{ url_for('static', filename='pagetools.js') }}" defer></script>
   <script src="{{ url_for('static', filename='browshare.js') }}" defer></script>
   <!-- <script src="{{ url_for('static', filename='TinyGesture.min.js') }}" defer></script> -->
-   <!-- <script src="https://cdn.jsdelivr.net/npm/tinygesture@3.0.0/dist/TinyGesture.min.js"></script> -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/tinygesture@3.0.0/dist/TinyGesture.min.js"></script> -->
   <script type="module">
     import TinyGesture from 'https://cdn.jsdelivr.net/npm/tinygesture@3.0.0/dist/TinyGesture.min.js';
     // import TinyGesture from 'tinygesture';
@@ -60,8 +60,23 @@
     document.addEventListener('DOMContentLoaded', function () {
       const target = document.getElementsByClassName('swiper')[0];
 
+      const options = {
+        // Set a higher threshold for horizontal movement (e.g., 50px)
+        // and a lower one for vertical movement (e.g., 10px).
+        threshold: (type, self) => {
+          if (type === 'x') {
+            // return Math.max(50, Math.floor(0.15 * (window.innerWidth || document.body.clientWidth)));
+            return 10;
+          } else {
+            // return Math.max(10, Math.floor(0.15 * (window.innerHeight || document.body.clientHeight)));
+            return 10;
+          }
+        },
+        // Other options...
+      };
+
       // 2. Initialize TinyGesture
-      const gesture = new TinyGesture(target);
+      const gesture = new TinyGesture(target, options);
 
       // 3. Listen for swipe events
       gesture.on('swipeleft', () => {

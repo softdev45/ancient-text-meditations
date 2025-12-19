@@ -4,6 +4,8 @@ __pycache__/
 
 unused/
 
+.vscode/
+
 # Build Artifacts
 build/
 dist/

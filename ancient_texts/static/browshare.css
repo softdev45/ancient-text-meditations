@@ -73,6 +73,10 @@
       font-size: 1rem ;
     }
 
+    .swiper {
+      /* touch-action: p; */
+    }
+
     #controls {
       position: fixed;
       bottom:0;
