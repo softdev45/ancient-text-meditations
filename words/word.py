@@ -152,8 +152,8 @@ def print_rows(rows):
     print(len(rows))
 
 
-# def load(dbfile = './words/new2_db_100k.csv'):
-def load(dbfile = './words/new2_db.csv'):
+def load(dbfile = './words/new2_db_100k.csv'):
+# def load(dbfile = './words/new2_db.csv'):
     # import traceback
     # traceback.print_stack()
     #global db
