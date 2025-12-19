@@ -4,10 +4,38 @@ from ancient_texts.core import get_nav_data
 from ancient_texts.use_text_query import trigger_request, get_verse, get_greek
 import time
 
+
+# from werkzeug.middleware.dispatcher import DispatcherMiddleware
+# from werkzeug.serving import run_simple
+
 app = Flask(__name__)
 
 
 @app.route('/')
+def browshare():
+	return render_template('browshare.html')
+
+@app.route('/api/browshare/cmd', methods=['POST'])
+def bs_cmd():
+    print(request.args.keys())
+    loc= request.args.get('cmd')
+    data = request.get_json()
+    print(data)
+    cmd = data['cmd']
+    # verse_type:str = str(request.args.get('type', default=False))
+
+    # print('getting loc:', loc, 'verse_type=', verse_type)
+
+    # if verse_type == 'inter':
+        # return jsonify(get_verse(loc))
+
+    # loc = loc.split(',')
+    # loc.remove(loc[1])
+    result = VB.query_word(cmd)
+    return jsonify(result)
+    
+
+@app.route('/alphabet')
 def index():
 	return render_template('index.html')
 

@@ -41,7 +41,7 @@ nav_symbols = {
 	1:	['Leader', 'Love', 'Master', 'First', 'Strength'],
 	2:	['Tent', 'House', 'Temple', 'Community', 'Inside', 'Heart'],
 	3:	['Leg', 'Meditation', 'Prayer', 'Elavate', 'Rise'],
-	4:	['Way', 'Door', 'Lower', 'Attitude', 'Truth'],
+	4:	['Way', 'Door', 'Lower', 'Attitude' ],
 	5:	['Word', 'Influence', 'Revelation', 'Human', 'Spirit'],
 	6:	['Nail/Hook', 'Connection', 'Weakness', 'Join/Add'],
 	7:	['Plough', 'Make Ready', 'Overturn', 'Sword', 'Tongue'],

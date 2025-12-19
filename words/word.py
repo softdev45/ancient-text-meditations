@@ -152,12 +152,13 @@ def print_rows(rows):
     print(len(rows))
 
 
-def load():
+# def load(dbfile = './words/new2_db_100k.csv'):
+def load(dbfile = './words/new2_db.csv'):
     # import traceback
     # traceback.print_stack()
     #global db
     if not Word.db:
-        wdb = load_new('./words/new2_db_100k.csv')
+        wdb = load_new(dbfile)
         # wdb = main.load_new('./new2_db.csv')
         db = list(map(lambda w: Word(w), wdb))
         Word.db = db
@@ -202,6 +203,8 @@ def program():
             cmd = tuple(map(int,cmd))
             print(cmd)
             r = filter(lambda w: (cmd[0],cmd[1],cmd[2]) == (w.book,w.chapter,w.verse), db)
+        elif wrd[0] == '&':
+            r = filter(lambda w: wrd[1:] in w.root, db)
         else:
             r = filter(lambda w: wrd in w.word or wrd in w.root or wrd in w.en, db)
         #r = filter(lambda w: 'verb' in w.type, r)

@@ -1,0 +1,45 @@
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts.css') }}" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{ url_for('static', filename='browshare.css') }}" crossorigin="anonymous">
+  <style>
+  </style>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+  <header>
+    <!-- Guides in studying science, information technology and languages. -->
+    <!-- Jesus Christ -->
+    <!-- "I am the Truth, the Way, and the Life" -->
+    <button onclick="rotateCustomFonts()">Change Font</button>
+    <a href="/alphabet" style="color: #242424;">Ancient Scriptures</a>
+  </header>
+  <nav>
+
+  </nav>
+  <main>
+
+
+    <!-- <h2>Functions, Equations and Data Structures</h2> -->
+    <!-- <h1>Browshare</h1> -->
+    <div id="command-control">
+      <input id="query-input" placeholder="search..." />
+    </div>
+
+    <div id="word">
+
+    </div>
+
+    <div id="log-display">
+
+    </div>
+
+  </main>
+  <script src="{{ url_for('static', filename='pagetools.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='browshare.js') }}" defer></script>
+</body>
+
+</html>

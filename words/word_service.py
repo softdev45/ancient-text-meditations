@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+import itertools
 
 # 1. Initialize the Flask application instance
 app = Flask(__name__)
@@ -64,7 +65,10 @@ def get_related_words():
         # filter-out duplicates by root
         names_present = set()
 
-        words =  list(map(lambda el: el[1][0], words)) #[1]-wordlist, [0]-first; el -> (dist, [word-occur], 'word')
+        
+        words =  list(map(lambda el: unique_by(el[1], lambda el: el.en), words)) #[1]-wordlist, [0]-first; el -> (dist, [word-occur], 'word')
+        words = list(itertools.chain.from_iterable(words))
+        # words =  list(map(lambda el: el[1][0], words)) #[1]-wordlist, [0]-first; el -> (dist, [word-occur], 'word')
 
         if len(words) > 3:
             words = list(filter( lambda el: el.en[0].islower(),  words))         

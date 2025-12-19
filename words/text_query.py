@@ -11,6 +11,20 @@ def verse_query(ref: str):
 	result = list(map(lambda wrd: wrd.get_data(), result))
 	return result
 
+
+""" def eng_word_query(query: str):
+	result = []
+	words = Word.db
+
+	# for word in words:
+	result = list(
+		filter(
+			lambda w: query in w.en or query in w.ctx_en
+		)
+	)
+
+ """
+
 def word_query(word: str):
 	result = []
 	#TODO test for 6 3 5 (conn leg revel) somewhat-FIXED 
