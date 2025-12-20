@@ -66,12 +66,12 @@
       /* margin-bottom: 10%; */
     }
 
-    #word > div:first-child .verse-text{
+    #word>div:first-child .verse-text {
       font-size: 1.8rem;
     }
 
-    #word > div:not(:first-child) .verse-text{
-      font-size: 1rem ;
+    #word>div:not(:first-child) .verse-text {
+      font-size: 1rem;
     }
 
     .swiper {
@@ -80,15 +80,18 @@
 
     #controls {
       position: fixed;
-      bottom:0;
+      bottom: 0;
       width: 100vw;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       height: 15%;
+      
+      transform: translate3d(0, 0, 0);
+      z-index: 0;
     }
 
-    #controls > div {
-      display:grid;
+    #controls>div {
+      display: grid;
       grid-template-rows: 1fr 1fr;
       /* flex-direction: column; */
       /* flex: 1; */
