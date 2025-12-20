@@ -46,7 +46,10 @@ initFonts();
 
 
 
-
+function toggleSearch() {
+    const elem = document.getElementById('command-control')
+    elem.classList.toggle('is-hidden')
+}
 
 
 

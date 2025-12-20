@@ -62,7 +62,7 @@
     }
 
     #word {
-      margin-top: 10px;
+      margin-top: 0px;
       /* margin-bottom: 10%; */
     }
 
@@ -83,12 +83,49 @@
       bottom: 0;
       width: 100vw;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      height: 15%;
-      
+      place-items: center;
+      height: 20vh;
+    }
+
+
+    .four-way-arrow {
+      width: 150px;
+      height: 150px;
+      background-color: #333;
+
+      /* ADJUSTED FOR THICKNESS: Changed the 47/53% gaps to 40/60% */
+      clip-path: polygon(
+          /* Top Head */
+          50% 0%, 70% 25%, 60% 25%,
+          /* Right Head */
+          60% 40%, 75% 40%, 75% 30%, 100% 50%, 75% 70%, 75% 60%,
+          /* Bottom Head */
+          60% 60%, 60% 75%, 70% 75%, 50% 100%, 30% 75%, 40% 75%,
+          /* Left Head */
+          40% 60%, 25% 60%, 25% 70%, 0% 50%, 25% 30%, 25% 40%,
+          /* Closing center */
+          40% 40%, 40% 25%, 30% 25%);
+    }
+
+    .swiper {
+      position: relative;
       transform: translate3d(0, 0, 0);
       z-index: 0;
+      width: 70px;
+      height: 70px;
+      background-color: rgb(134, 124, 111);
     }
+
+    .control-btns {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      height: 50%;
+    }
+
+    .control-btns>* {
+      height: 100%;
+    }
+
 
     #controls>div {
       display: grid;
@@ -108,6 +145,8 @@
       font-family: 'Average-Regular';
       background-color: #f4f4f1;
       background-color: var(--bg-col);
+      height: 100%;
+      overflow: hidden;
     }
 
     header {
@@ -117,7 +156,16 @@
       color: #181717;
       margin: 0;
       padding: 10px;
-      margin-bottom: 10px;
+      /* margin-bottom: 10px; */
+    }
+
+    /* .fade-element {
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    } */
+
+    .is-hidden {
+      display:none;
     }
 
     main {
