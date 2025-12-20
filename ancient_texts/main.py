@@ -12,8 +12,10 @@ app = Flask(__name__)
 
 
 @app.route('/')
-def browshare():
-	return render_template('browshare.html')
+@app.route('/<path:path>')
+def browshare(path=None):
+    print(f'visting: {path}')
+    return render_template('browshare.html')
 
 @app.route('/api/browshare/cmd', methods=['POST'])
 def bs_cmd():

@@ -7,24 +7,37 @@ const contentDisplay = document.getElementById('word');
 
 let contentHist = []
 let currentElem = 0
-let currentVerse = NaN
+let currentVerseNum = NaN
 let chapterData = new Map()
+
+function current() {
+  return contentHist[0]
+}
+function getCurrentVerse(){
+  return current().verses[currentElem]
+}
+function getCurrPath() {
+  return `#/${current().command}/${currentElem}/${currentVerseNum}`
+}
+function getBookChapter(verse){
+  return `${verse.book}:${verse.chapter}`
+}
 
 function handleCommandResult(data) {
   console.log(data)
   if (data.command.startsWith('<>')) {
-    const current = contentHist[0].data[currentElem]
-    chapterData.set(current, data.result)
-    renderHistory()
+    // const currentData = getCurrentVerse()
+    chapterData.set(getBookChapter(getCurrentVerse()), data.result)
+    renderView()
   } else {
     contentHist.unshift({
-      data: data.result,
+      verses: data.result,
       command: data.command,
       // verses: data.verses,
       // timestamp: Date.now(),
       // type: 'ref'
     })
-    currentVerse = data.result[0].verse;
+    currentVerseNum = data.result[0].verse;
   }
 }
 
@@ -52,18 +65,10 @@ async function sendCommand(command) {
     if (!response.ok) {
       renderError(data.detail || data.message || `Server responded with status ${response.status}.`);
     } else {
-      // await processCommandResult(data);
+
       handleCommandResult(data)
-      // 1. Add the successful report to history
+      renderView();
 
-      // 2. Render the updated history (newest on top)
-      renderHistory();
-
-      // 3. Clear the sequence and temporary visual state
-      // resetSequenceState();
-
-      // 4. Clear permanent usage counts (saturation)
-      // clearAllUsageCounts(); 
     }
   } catch (error) {
     console.error('Analysis Request Error:', error);
@@ -77,19 +82,19 @@ async function sendCommand(command) {
 function createVerseElem(data) {
   console.log(data)
   const verse = document.createElement('div')
-  const currentVerses = chapterData.get(contentHist[0].data[currentElem])
+  const versesOfCurrentChapter = chapterData.get(getBookChapter(getCurrentVerse()))
 
-  if (currentVerses) {
-    if (currentVerse > currentVerses.length) {
-      currentVerse = currentVerses.length
+  if (versesOfCurrentChapter) {
+    if (currentVerseNum > versesOfCurrentChapter.length) {
+      currentVerseNum = versesOfCurrentChapter.length
     }
-    if (currentVerse <= 0) {
-      currentVerse = 1
+    if (currentVerseNum <= 0) {
+      currentVerseNum = 1
     }
   }
 
-  if (currentVerse != data.verse && currentVerses) {
-    data = currentVerses[currentVerse - 1]
+  if (currentVerseNum != data.verse && versesOfCurrentChapter) {
+    data = versesOfCurrentChapter[currentVerseNum - 1]
   }
 
   console.log(data)
@@ -109,7 +114,7 @@ function createVerseElem(data) {
 
 }
 
-function renderHistory() {
+function renderView() {
 
   contentDisplay.replaceChildren()
 
@@ -117,14 +122,15 @@ function renderHistory() {
   // if (!currentElem){
   //   currentElem = contentHist.length -1;
   // }
-  let i = 0 //currentElem;
 
   const resultNode = document.createElement('div')
-  const data = contentHist[i].data
+  const data = current().verses
 
   const title = document.createElement('div')
-  title.innerText = '#' + contentHist[i].command
+  title.innerText = '#' + current().command
   resultNode.appendChild(title)
+
+
 
   // console.log(data)
   data.slice(currentElem, currentElem + 1).forEach(element => {
@@ -134,29 +140,31 @@ function renderHistory() {
   });
   contentDisplay.appendChild(resultNode)
 
+  history.replaceState(null, null, getCurrPath())
+
   // }
 }
 
 function changeView(step = 0) {
   if (step != 0) {
     currentElem += step;
-    currentElem %= contentHist[0].data.length
-    if (currentElem < 0) currentElem = contentHist[0].data.length-1
-    currentVerse = contentHist[0].data[currentElem].verse
-    renderHistory()
+    currentElem %= current().verses.length
+    if (currentElem < 0) currentElem = current().verses.length - 1
+    currentVerseNum = getCurrentVerse().verse
+    renderView()
   }
 }
 
 
 function stepVerse(step) {
-  console.log(currentVerse)
-  current = contentHist[0].data[currentElem]
-  currentVerse += step
-  if (!chapterData.has(current)) {
-    sendCommand(`<>${current.book}:${current.chapter}`)
+  console.log(currentVerseNum)
+  let currentVerse = getCurrentVerse()
+  currentVerseNum += step
+  if (!chapterData.has(getBookChapter(currentVerse))) {
+    sendCommand(`<>${currentVerse.book}:${currentVerse.chapter}`)
   } else {
-    console.log(currentVerse)
-    renderHistory()
+    console.log(currentVerseNum)
+    renderView()
   }
 }
 

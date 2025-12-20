@@ -45,18 +45,18 @@ class VerseBrowser():
     
     def query_ref(self, ref):
         # ref = list(map( lambda e: str(e), ref))
-        print(ref)
+        # print(ref)
         ref[1] = int(ref[1])
         result = [ asdict(v) for v in self.verses if ref[0] == v.book and ref[1] == v.chapter and (len(ref)<=2 or ref[2] == v.verse) ]
         self.last_ref_query_result = result 
-        print(result)
+        # print(result)
         return result
     
     def query_word(self, word):
-        print(word)
+        # print(word)
         result = [ asdict(v) for v in self.verses if word.lower() in v.text.lower()]
         self.last_word_query_result = result 
-        print(result)
+        # print(result)
         return result
 
 
