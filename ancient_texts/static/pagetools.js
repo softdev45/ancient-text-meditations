@@ -49,6 +49,8 @@ initFonts();
 function toggleSearch() {
     const elem = document.getElementById('command-control')
     elem.classList.toggle('is-hidden')
+    const queryInput = document.getElementById('query-input')
+    queryInput.focus()
 }
 
 
