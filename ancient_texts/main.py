@@ -23,8 +23,8 @@ def bs_cmd():
     verses = []
 
     cmd = data['cmd']
-    if cmd.startswith('<>'):
-        _cmd = cmd[2:].split(":")
+    if cmd.startswith('<chapter>'):
+        _cmd = cmd.split('>')[1].split("/")
         verses = VB.query_ref(_cmd)
     else:
         verses = VB.query_word(cmd)

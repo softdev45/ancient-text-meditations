@@ -5,40 +5,73 @@ const COMMAND_URL = API_BASE + 'browshare/cmd'; // POST endpoint
 const logDisplay = document.getElementById('log-display');
 const contentDisplay = document.getElementById('word');
 
-let contentHist = []
-let currentElem = 0
-let currentVerseNum = NaN
+let wordSearchResults = new Map()
 let chapterData = new Map()
+let currentCollection = []
+let currentIndex = NaN
 
-function current() {
-  return contentHist[0]
+// let currentElem = 0
+let currentVerseNum = NaN
+let currentBookChapter = NaN
+let lastCommand = '<cmd>'
+let firstHref = ''
+
+function gtCurVerse() {
+  return currentCollection[currentIndex]
 }
-function getCurrentVerse(){
-  return current().verses[currentElem]
-}
+// function getCurrentVerse() {
+//   if (!gtCurVerse()) {
+//     return undefined;
+//   }
+//   return gtCurVerse().verses[currentElem]
+// }
+// function getBookChapter(verse = undefined) {
+//   if (!verse) {
+//     verse = getCurrentVerse()
+//   }
+//   console.log(currentElem, verse)
+//   if (!verse) {
+//     return `JOH/1`
+//   }
+//   return `${verse.book}/${verse.chapter}`
+// }
 function getCurrPath() {
-  return `#/${current().command}/${currentElem}/${currentVerseNum}`
+  console.log(wordSearchResults.length)
+
+  if (!wordSearchResults) {
+    return '#'
+  }
+  return `#/${lastCommand}/${currentIndex}/${currentBookChapter}/${currentVerseNum}`
 }
-function getBookChapter(verse){
-  return `${verse.book}:${verse.chapter}`
+
+function selectVerse() {
+  currentBookChapter = `${gtCurVerse().book}/${gtCurVerse().chapter}`
+  currentVerseNum = gtCurVerse().verse
 }
 
 function handleCommandResult(data) {
   console.log(data)
-  if (data.command.startsWith('<>')) {
+  if (data.command.startsWith('<chapter>')) {
     // const currentData = getCurrentVerse()
-    chapterData.set(getBookChapter(getCurrentVerse()), data.result)
-    renderView()
+    const cmdBookChapter = data.command.split('>')[1]
+    // chapterData.set(getBookChapter(getCurrentVerse()), data.result)
+    chapterData.set(cmdBookChapter, data.result)
+    // renderView()
   } else {
-    contentHist.unshift({
+    wordSearchResults.set(data.command, {
       verses: data.result,
       command: data.command,
       // verses: data.verses,
       // timestamp: Date.now(),
       // type: 'ref'
     })
-    currentVerseNum = data.result[0].verse;
+    currentCollection = data.result;
+    currentIndex = 0
+    lastCommand = data.command
+    selectVerse()
+    // currentVerseNum = data.result[0].verse;
   }
+  renderView()
 }
 
 
@@ -66,8 +99,10 @@ async function sendCommand(command) {
       renderError(data.detail || data.message || `Server responded with status ${response.status}.`);
     } else {
 
+      logDisplay.innerHTML = ``
+
       handleCommandResult(data)
-      renderView();
+      // renderView();
 
     }
   } catch (error) {
@@ -82,7 +117,7 @@ async function sendCommand(command) {
 function createVerseElem(data) {
   console.log(data)
   const verse = document.createElement('div')
-  const versesOfCurrentChapter = chapterData.get(getBookChapter(getCurrentVerse()))
+  const versesOfCurrentChapter = chapterData.get(currentBookChapter)
 
   if (versesOfCurrentChapter) {
     if (currentVerseNum > versesOfCurrentChapter.length) {
@@ -93,22 +128,25 @@ function createVerseElem(data) {
     }
   }
 
-  if (currentVerseNum != data.verse && versesOfCurrentChapter) {
+  if (data && currentVerseNum != data.verse && versesOfCurrentChapter) {
     data = versesOfCurrentChapter[currentVerseNum - 1]
   }
 
   console.log(data)
 
+  if (!data) return;
 
-  const ref = document.createElement('span')
-  ref.innerText = `${data.book} ${data.chapter}:${data.verse}`
-  ref.classList.add('verse-ref')
-  const text = document.createElement('div')
-  text.classList.add('verse-text')
-  text.innerText = data.text
 
-  verse.appendChild(ref)
-  verse.appendChild(text)
+  const verseReference = document.createElement('span')
+  verseReference.innerText = `${data.book} ${data.chapter}:${data.verse}`
+  verseReference.classList.add('verse-ref')
+
+  const verseText = document.createElement('div')
+  verseText.classList.add('verse-text')
+  verseText.innerText = data.text
+
+  verse.appendChild(verseReference)
+  verse.appendChild(verseText)
 
   return verse;
 
@@ -124,20 +162,26 @@ function renderView() {
   // }
 
   const resultNode = document.createElement('div')
-  const data = current().verses
+  // if (!current()) return;
+  // const data = current().verses
 
   const title = document.createElement('div')
-  title.innerText = '#' + current().command
+  title.innerText = '#' + lastCommand
   resultNode.appendChild(title)
 
 
 
-  // console.log(data)
-  data.slice(currentElem, currentElem + 1).forEach(element => {
-    const item = createVerseElem(element)
-    // item.innerText = JSON.stringify(element);
+  const item = createVerseElem(gtCurVerse())
+  if (item)
     resultNode.appendChild(item)
-  });
+
+  // // console.log(data)
+  // data.slice(currentElem, currentElem + 1).forEach(element => {
+  //   const item = createVerseElem(element)
+  //   // item.innerText = JSON.stringify(element);
+  //   resultNode.appendChild(item)
+  // });
+
   contentDisplay.appendChild(resultNode)
 
   history.replaceState(null, null, getCurrPath())
@@ -147,10 +191,10 @@ function renderView() {
 
 function changeView(step = 0) {
   if (step != 0) {
-    currentElem += step;
-    currentElem %= current().verses.length
-    if (currentElem < 0) currentElem = current().verses.length - 1
-    currentVerseNum = getCurrentVerse().verse
+    currentIndex += step;
+    currentIndex %= currentCollection.length
+    if (currentIndex < 0) currentIndex = currentCollection.length - 1
+    currentVerseNum = gtCurVerse().verse
     renderView()
   }
 }
@@ -158,10 +202,9 @@ function changeView(step = 0) {
 
 function stepVerse(step) {
   console.log(currentVerseNum)
-  let currentVerse = getCurrentVerse()
   currentVerseNum += step
-  if (!chapterData.has(getBookChapter(currentVerse))) {
-    sendCommand(`<>${currentVerse.book}:${currentVerse.chapter}`)
+  if (!chapterData.has(currentBookChapter)) {
+    sendCommand(`<chapter>${currentBookChapter}`)
   } else {
     console.log(currentVerseNum)
     renderView()
@@ -174,7 +217,6 @@ function renderError(message) {
                     <div class="error-message">
                         <h3>⚠️ Fetch Error</h3>
                         <p>${message}</p>
-                        <p><strong>Please ensure your Python Flask server is running on <a href="${API_BASE.slice(0, -5)}" target="_blank">http://127.0.0.1:5000</a>.</strong></p>
                     </div>
                 `;
 }
@@ -205,11 +247,11 @@ document.addEventListener('keydown', function (event) {
   }
   if (event.key === "ArrowUp") {
     event.preventDefault()
-    changeView(-1)
+    changeView(1)
   }
   if (event.key === "ArrowDown") {
     event.preventDefault()
-    changeView(1)
+    changeView(-1)
   }
   if (event.key === "ArrowLeft") {
     event.preventDefault()
@@ -249,8 +291,27 @@ if (queryInput) {
 
 
 
+function goToRef(path) {
+  const pth = path.split('/')
+  if (!pth.includes('#')) {
+    return
+  }
+  console.log(pth)
+  let bookChap = `${pth.at(-3)}/${pth.at(-2)}`
+  // let bookChapReq = `${pth.at(-3)}/${pth.at(-2)}`
+  if (!chapterData.has(bookChap)) (
+    sendCommand(`<chapter>${bookChap}`)
+  )
+  // currentElem = Number(pth.at(-4))
+  currentIndex = Number(pth.at(-4))
+  currentVerseNum = Number(pth.at(-1))
+  currentBookChapter = pth.at(-3)
+}
 
+// console.log(location.href)
+firstHref = location.href
+// sendCommand('Jesus')
+goToRef(firstHref)
 
-sendCommand('Jesus')
 
 
