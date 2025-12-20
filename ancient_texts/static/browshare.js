@@ -197,11 +197,11 @@ document.addEventListener('keydown', function (event) {
   }
   if (event.key === "ArrowUp") {
     event.preventDefault()
-    changeView(1)
+    changeView(-1)
   }
   if (event.key === "ArrowDown") {
     event.preventDefault()
-    changeView(-1)
+    changeView(1)
   }
   if (event.key === "ArrowLeft") {
     event.preventDefault()
@@ -218,7 +218,8 @@ const queryInput = document.getElementById('query-input');
 if (queryInput) {
   queryInput.addEventListener('keydown', function (event) {
     // Check for Ctrl key and Enter key
-    if (event.ctrlKey && event.key === 'Enter') {
+    // if (event.ctrlKey && event.key === 'Enter') {
+    if (event.key === 'Enter') {
       // Prevent the default action (e.g., new line in a textarea)
       event.preventDefault();
 

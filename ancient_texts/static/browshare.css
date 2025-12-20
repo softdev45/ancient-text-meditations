@@ -26,7 +26,7 @@
 
     /* spacing links in header */
     header a {
-      margin: 0 20px;
+      margin: 0 5px;
 
     }
 
@@ -42,7 +42,7 @@
       font-family: inherit;
       font-size: 1.5rem;
       background-color: var(--bg-col);
-      padding: 1rem;
+      padding: 0.1rem;
       border: none;
       width: 60%;
       /* padding: 0 20vw; */
@@ -63,10 +63,11 @@
 
     #word {
       margin-top: 10px;
+      /* margin-bottom: 10%; */
     }
 
     #word > div:first-child .verse-text{
-      font-size: 2rem;
+      font-size: 1.8rem;
     }
 
     #word > div:not(:first-child) .verse-text{
@@ -74,7 +75,7 @@
     }
 
     .swiper {
-      /* touch-action: p; */
+      touch-action: none;
     }
 
     #controls {
