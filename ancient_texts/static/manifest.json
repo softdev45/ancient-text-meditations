@@ -1,0 +1,16 @@
+{
+  "short_name": "֥Browshare",
+  "name": "the Word Browser",
+  "start_url": "/",
+  "id": "browshare",
+  "display": "standalone",
+  "background_color": "#f4f4f1",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/static/icon155.png",
+      "sizes": "155x155",
+      "type": "image/png"
+    }
+  ]
+}

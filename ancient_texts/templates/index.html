@@ -33,7 +33,7 @@
         /* --- Header Panel Styling (Thin, Dark, Full Width) --- */
         .header-panel {
             width: 100%;
-            background-color: #1b1133; /* Dark Blue */
+            background-color: #b6b6b6; /* Dark Blue */
             color: white;
             padding: 12px 0; 
             text-align: center;
@@ -59,7 +59,7 @@
         }
 
         .command-input {
-            width: 500px;
+            /* width: 500px; */
             font-size: 1.5rem;
             font-family: 'OHFont';
             font-weight: 500;
@@ -79,7 +79,7 @@
         .grid-container {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            width: 500px;
+            /* width: 500px; */
             /* height: 500px; */
             /* UPDATED: Thicker, more saturated border and enhanced shadow */
             border: 2px solid #b1b4bd; 
@@ -398,7 +398,7 @@
         .report-card h2 {
             color: #1e3a8a;
             margin-top: 0;
-            margin-bottom: 10px;
+            margin-bottom: 10/commapx;
         }
 
         .report-card p {
@@ -452,12 +452,20 @@
             color: gray;
             padding-top: 20px;
         }
+
+        a {
+            color:#060c1d;
+        }
     </style>
 </head>
 <body>
 
     <!-- NEW: Thin, Dark Header Panel -->
     <div class="header-panel">
+        <div>
+        <a href="/">Go back to Browser</a>
+
+        </div>
 	    <!--<h1>Adaptive Interactive word-based insight tool</h1>-->
         <h1>Meditation on the Ancient Scrolls tool</h1>
         <p>Click tiles to compose a sequence, then click "Send" to receive verses to meditate.</p>

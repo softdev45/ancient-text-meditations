@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, send_from_directory
 from ancient_texts.core import get_nav_data
 
 from ancient_texts.use_text_query import trigger_request, get_verse, get_greek
@@ -10,12 +10,10 @@ import time
 
 app = Flask(__name__)
 
+@app.route('/sw.js')
+def serve_sw():
+    return send_from_directory(app.root_path, 'sw.js', mimetype='application/javascript')
 
-@app.route('/')
-@app.route('/<path:path>')
-def browshare(path=None):
-    print(f'visting: {path}')
-    return render_template('browshare.html')
 
 @app.route('/api/browshare/cmd', methods=['POST'])
 def bs_cmd():
@@ -35,6 +33,12 @@ def bs_cmd():
         'command' : cmd
     }
     return jsonify(result)
+
+@app.route('/')
+@app.route('/<path:path>')
+def browshare(path=None):
+    print(f'visting: {path}')
+    return render_template('browshare.html')
     
 
 @app.route('/alphabet')
