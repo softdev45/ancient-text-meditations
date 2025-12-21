@@ -36,7 +36,7 @@ function gtCurVerse() {
 //   return `${verse.book}/${verse.chapter}`
 // }
 function getCurrPath() {
-  console.log(wordSearchResults.length)
+  console.log(wordSearchResults.size)
 
   if (!wordSearchResults) {
     return '#'
@@ -50,7 +50,7 @@ function selectVerse() {
 }
 
 function handleCommandResult(data) {
-  console.log(data)
+  console.log('Handling cmd result:',data)
   if (data.command.startsWith('<chapter>')) {
     // const currentData = getCurrentVerse()
     const cmdBookChapter = data.command.split('>')[1]
@@ -128,7 +128,7 @@ function createVerseElem(data) {
     }
   }
 
-  if (data && currentVerseNum != data.verse && versesOfCurrentChapter) {
+  if (!data && (true || currentVerseNum != data.verse) && versesOfCurrentChapter) {
     data = versesOfCurrentChapter[currentVerseNum - 1]
   }
 
@@ -152,7 +152,7 @@ function createVerseElem(data) {
 
 }
 
-function renderView() {
+function renderView(elemToRender=undefined) {
 
   contentDisplay.replaceChildren()
 
@@ -171,7 +171,10 @@ function renderView() {
 
 
 
-  const item = createVerseElem(gtCurVerse())
+  if(!elemToRender){
+    elemToRender = gtCurVerse()
+  }
+  const item = createVerseElem(elemToRender)
   if (item)
     resultNode.appendChild(item)
 
@@ -291,21 +294,32 @@ if (queryInput) {
 
 
 
-function goToRef(path) {
+async function goToRef(path) {
   const pth = path.split('/')
+  console.log(pth)
+
   if (!pth.includes('#')) {
     return
   }
-  console.log(pth)
+
+  lastCommand = pth.at(-5);
+  if(!wordSearchResults.has(lastCommand)){
+    await sendCommand(lastCommand)
+  }
+
   let bookChap = `${pth.at(-3)}/${pth.at(-2)}`
-  // let bookChapReq = `${pth.at(-3)}/${pth.at(-2)}`
   if (!chapterData.has(bookChap)) (
-    sendCommand(`<chapter>${bookChap}`)
+    await sendCommand(`<chapter>${bookChap}`)
   )
-  // currentElem = Number(pth.at(-4))
+
+  console.log('Setting current from path: ', path)
   currentIndex = Number(pth.at(-4))
   currentVerseNum = Number(pth.at(-1))
-  currentBookChapter = pth.at(-3)
+  currentBookChapter = bookChap; //pth.at(-3)
+  console.log(currentVerseNum,typeof(currentVerseNum))
+  let toRender = chapterData.get(bookChap)[currentVerseNum-1]
+
+  renderView(toRender);
 }
 
 // console.log(location.href)
