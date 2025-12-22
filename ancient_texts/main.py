@@ -10,6 +10,14 @@ import time
 
 app = Flask(__name__)
 
+@app.route('/favicon.ico')
+def favicon():
+    response = send_from_directory(os.path.join(app.root_path, 'static'),
+                                  'favicon.ico', mimetype='image/png')
+    # Tell the browser to cache this for 30 days
+    response.headers['Cache-Control'] = 'public, max-age=2592000'
+    return response
+
 @app.route('/sw.js')
 def serve_sw():
     return send_from_directory(app.root_path, 'sw.js', mimetype='application/javascript')

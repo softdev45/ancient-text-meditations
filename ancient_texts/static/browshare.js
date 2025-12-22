@@ -15,8 +15,13 @@ let currentVerseNum = NaN
 let currentBookChapter = NaN
 let lastCommand = '<cmd>'
 let firstHref = ''
+let steppingOn = null
+
 
 function gtCurVerse() {
+  if (steppingOn=='chapter'){
+    return chapterData.get(currentBookChapter)[currentVerseNum-1]
+  }
   return currentCollection[currentIndex]
 }
 // function getCurrentVerse() {
@@ -44,13 +49,17 @@ function getCurrPath() {
   return `#/${lastCommand}/${currentIndex}/${currentBookChapter}/${currentVerseNum}`
 }
 
+function getCurrentBookChapter() {
+  return `${gtCurVerse().book}/${gtCurVerse().chapter}`;
+}
+
 function selectVerse() {
-  currentBookChapter = `${gtCurVerse().book}/${gtCurVerse().chapter}`
+  currentBookChapter = getCurrentBookChapter()
   currentVerseNum = gtCurVerse().verse
 }
 
 function handleCommandResult(data) {
-  console.log('Handling cmd result:',data)
+  console.log('Handling cmd result:', data)
   if (data.command.startsWith('<chapter>')) {
     // const currentData = getCurrentVerse()
     const cmdBookChapter = data.command.split('>')[1]
@@ -58,6 +67,7 @@ function handleCommandResult(data) {
     chapterData.set(cmdBookChapter, data.result)
     // renderView()
   } else {
+    steppingOn = 'searchResult'
     wordSearchResults.set(data.command, {
       verses: data.result,
       command: data.command,
@@ -83,6 +93,8 @@ async function sendCommand(command) {
   // contentDisplay.innerHTML = `<p class="message">Sending command...</p>`;
 
   // const wordString = composedWord.map(tile => tile.title).join(' ');
+
+
 
   try {
     const response = await fetch(COMMAND_URL, {
@@ -115,20 +127,20 @@ async function sendCommand(command) {
 }
 
 function createVerseElem(data) {
-  console.log(data)
+  console.log('creating elem:', data)
   const verse = document.createElement('div')
   const versesOfCurrentChapter = chapterData.get(currentBookChapter)
 
-  if (versesOfCurrentChapter) {
-    if (currentVerseNum > versesOfCurrentChapter.length) {
-      currentVerseNum = versesOfCurrentChapter.length
-    }
-    if (currentVerseNum <= 0) {
-      currentVerseNum = 1
-    }
-  }
 
   if (!data && (true || currentVerseNum != data.verse) && versesOfCurrentChapter) {
+    if (versesOfCurrentChapter) {
+      if (currentVerseNum > versesOfCurrentChapter.length) {
+        currentVerseNum = versesOfCurrentChapter.length
+      }
+      if (currentVerseNum <= 0) {
+        currentVerseNum = 1
+      }
+    }
     data = versesOfCurrentChapter[currentVerseNum - 1]
   }
 
@@ -152,7 +164,7 @@ function createVerseElem(data) {
 
 }
 
-function renderView(elemToRender=undefined) {
+function renderView(elemToRender = undefined) {
 
   contentDisplay.replaceChildren()
 
@@ -171,7 +183,7 @@ function renderView(elemToRender=undefined) {
 
 
 
-  if(!elemToRender){
+  if (!elemToRender) {
     elemToRender = gtCurVerse()
   }
   const item = createVerseElem(elemToRender)
@@ -193,24 +205,41 @@ function renderView(elemToRender=undefined) {
 }
 
 function changeView(step = 0) {
+  steppingOn = 'searchResult'
   if (step != 0) {
     currentIndex += step;
     currentIndex %= currentCollection.length
     if (currentIndex < 0) currentIndex = currentCollection.length - 1
     currentVerseNum = gtCurVerse().verse
+    currentBookChapter = getCurrentBookChapter()
+
     renderView()
   }
 }
 
 
 function stepVerse(step) {
-  console.log(currentVerseNum)
+  steppingOn = 'chapter'
+  console.log('stepping from: ', currentVerseNum, step)
   currentVerseNum += step
+  //overstepping check
+  const versesOfCurrentChapter = chapterData.get(currentBookChapter)
+
+  if (versesOfCurrentChapter) {
+    if (currentVerseNum > versesOfCurrentChapter.length) {
+      currentVerseNum = versesOfCurrentChapter.length
+    }
+    if (currentVerseNum <= 0) {
+      currentVerseNum = 1
+    }
+  }
+
   if (!chapterData.has(currentBookChapter)) {
     sendCommand(`<chapter>${currentBookChapter}`)
   } else {
     console.log(currentVerseNum)
-    renderView()
+    let currVerse = chapterData.get(currentBookChapter)[currentVerseNum - 1]
+    renderView(currVerse)
   }
 }
 
@@ -303,7 +332,7 @@ async function goToRef(path) {
   }
 
   lastCommand = pth.at(-5);
-  if(!wordSearchResults.has(lastCommand)){
+  if (!wordSearchResults.has(lastCommand)) {
     await sendCommand(lastCommand)
   }
 
@@ -316,8 +345,8 @@ async function goToRef(path) {
   currentIndex = Number(pth.at(-4))
   currentVerseNum = Number(pth.at(-1))
   currentBookChapter = bookChap; //pth.at(-3)
-  console.log(currentVerseNum,typeof(currentVerseNum))
-  let toRender = chapterData.get(bookChap)[currentVerseNum-1]
+  console.log(currentVerseNum, typeof (currentVerseNum))
+  let toRender = chapterData.get(bookChap)[currentVerseNum - 1]
 
   renderView(toRender);
 }
