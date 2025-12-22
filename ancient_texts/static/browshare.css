@@ -17,7 +17,7 @@
       background-color: var(--bg-col);
       border: 1px;
       text-align: center;
-      padding: 5px;
+      padding: 2px 5px;
     }
 
     a:hover {
@@ -27,6 +27,7 @@
     /* spacing links in header */
     header a {
       margin: 0 5px;
+      display:inline-block;
 
     }
 

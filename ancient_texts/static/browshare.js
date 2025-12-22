@@ -353,7 +353,7 @@ async function goToRef(path) {
 
 // console.log(location.href)
 firstHref = location.href
-// sendCommand('Jesus')
+sendCommand('Jealous')
 goToRef(firstHref)
 
 
