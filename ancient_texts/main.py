@@ -5,6 +5,9 @@ from ancient_texts.use_text_query import trigger_request, get_verse, get_greek
 import time
 
 import os
+import threading
+import requests
+
 
 
 # from werkzeug.middleware.dispatcher import DispatcherMiddleware
@@ -43,6 +46,31 @@ def bs_cmd():
         'command' : cmd
     }
     return jsonify(result)
+
+
+def keep_alive():
+    # Wait for the server to start
+    time.sleep(10)
+    # Replace with your actual Render URL
+    url = "http://localhost:5000/health"
+
+    while True:
+        try:
+            requests.get(url)
+            print("Self-ping successful.")
+        except Exception as e:
+            print(f"Self-ping failed: {e}")
+
+        # Ping every 14 minutes (Render sleeps after 15)
+        time.sleep(60)
+        # time.sleep(10)
+
+threading.Thread(target=keep_alive, daemon=True).start()
+
+
+@app.route('/health')
+def health():
+    return "OK", 200
 
 @app.route('/')
 @app.route('/<path:path>')
