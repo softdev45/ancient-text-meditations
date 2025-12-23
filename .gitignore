@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 
+_local_dev_env
 unused/
 
 .vscode/

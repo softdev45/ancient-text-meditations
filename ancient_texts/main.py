@@ -8,7 +8,14 @@ import os
 import threading
 import requests
 
+from pathlib import Path
 
+dev_marker_file = Path("./_local_dev_env")
+DEV_ENV = False
+
+if dev_marker_file.exists():
+    print("DEV ENV!")
+    DEV_ENV = True
 
 # from werkzeug.middleware.dispatcher import DispatcherMiddleware
 # from werkzeug.serving import run_simple
@@ -62,10 +69,11 @@ def keep_alive():
             print(f"Self-ping failed: {e}")
 
         # Ping every 14 minutes (Render sleeps after 15)
-        time.sleep(60)
+        time.sleep(14 * 60)
         # time.sleep(10)
 
-threading.Thread(target=keep_alive, daemon=True).start()
+if not DEV_ENV:
+    threading.Thread(target=keep_alive, daemon=True).start()
 
 
 @app.route('/health')
