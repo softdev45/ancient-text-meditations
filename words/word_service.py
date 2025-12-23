@@ -51,7 +51,8 @@ def get_related_words():
     input_seq = input_word.split(',')
     input_seq = get_translation(input_seq)
     words = word_query(input_seq)
-    print(words)
+    #TODO improving logging for long results
+    print(words[:10])
 
     #map to english translations
     if False and len(words) == 1:
@@ -67,15 +68,19 @@ def get_related_words():
 
         
         words =  list(map(lambda el: unique_by(el[1], lambda el: el.en), words)) #[1]-wordlist, [0]-first; el -> (dist, [word-occur], 'word')
+        print('after unique_by len', len(words))
         words = list(itertools.chain.from_iterable(words))
         # words =  list(map(lambda el: el[1][0], words)) #[1]-wordlist, [0]-first; el -> (dist, [word-occur], 'word')
 
         if len(words) > 3:
-            words = list(filter( lambda el: el.en[0].islower(),  words))         
+            #TODO refactor prod-quickfix (YHWH)
+            words = list(filter( lambda el: el.en=='YHWH' or el.en[0].islower(),  words))         
 
+        print('before 2nd unique_by len', len(words))
         # related_list = list(map( lambda wrd: wrd.en, words))
         #TODO
         words = unique_by(words, lambda el: el.en)
+        print('after unique_by len', len(words))
         def get_word(w):
             # print(w)
             result = {key: val for key,val in w.__dict__.items()  if key in ["word","root", "en", "ctx_en"]}

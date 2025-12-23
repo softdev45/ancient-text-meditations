@@ -45,8 +45,12 @@ class VerseBrowser():
     
     def query_ref(self, ref):
         # ref = list(map( lambda e: str(e), ref))
-        # print(ref)
+        print(ref)
         ref[1] = int(ref[1])
+        #quick fix for PROD; TODO: refactor
+        if(len(ref)==3):
+            ref[2] = int(ref[2])
+
         result = [ asdict(v) for v in self.verses if ref[0] == v.book and ref[1] == v.chapter and (len(ref)<=2 or ref[2] == v.verse) ]
         self.last_ref_query_result = result 
         # print(result)

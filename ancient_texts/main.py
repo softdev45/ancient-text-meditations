@@ -4,6 +4,8 @@ from ancient_texts.core import get_nav_data
 from ancient_texts.use_text_query import trigger_request, get_verse, get_greek
 import time
 
+import os
+
 
 # from werkzeug.middleware.dispatcher import DispatcherMiddleware
 # from werkzeug.serving import run_simple

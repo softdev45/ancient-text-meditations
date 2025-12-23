@@ -63,8 +63,9 @@ def word_query(word: str):
 		found = list(reversed(sorted([(pylcs.lcs_string_length(word,key),val,key) for key,val in words_aggreg ], key=lambda el:el[0])))
 		max_len,_1,_2 = found[0]
 		found = [el for el in found if el[0] == max_len and len(el[1])>0 ]
+		sub_string_result = found
 		max_len_str = max_len
-		print('string', found)
+		print('string', found[0:10])
 		# try browsing with longest common sequence
 		found = list(reversed(sorted([(pylcs.lcs_sequence_length(word,key),val,key) for key,val in words_aggreg ], key=lambda el:el[0])))
 		max_len,_1,_2 = found[0]
@@ -73,7 +74,7 @@ def word_query(word: str):
 		print(max_len)
 		if max_len >= len(word)-2:
 			found = [el for el in found if el[0] == max_len and len(el[1])>0 ]
-			print('subseq', found)
+			print('subseq', found[:10])
 			result.extend(found)
 	
 
