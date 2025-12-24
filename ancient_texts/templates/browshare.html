@@ -10,6 +10,7 @@
   <style>
   </style>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+  <title>Browse and share the Word</title>
 </head>
 
 <body>
@@ -21,7 +22,7 @@
     <button onclick="toggleSearch()" style="margin-right: 10%;">Search...</button>
     <a href="/alphabet" style="color: #242424; margin-left:0%">Tablets</a>
     <a href="http://ldcfs.github.io" style="color: #242424; margin-left:0%">by LDC</a>
-    
+
   </header>
   <nav>
 
@@ -39,16 +40,17 @@
 
     </div>
 
-    <div id="controls">
+    <div class="swiper-container">
+
       <div class="swiper four-way-arrow touch-area"></div>
-      <div class="control-btns">
-        <button onclick="stepVerse(-1)" class="button-prev-verse">Previous Verse (or swipe)</button>
-        <div>
-          <button onclick="changeView(-1)">Previous Find</button>
-          <button onclick="changeView(1)">Next Find</button>
-        </div>
+    </div>
+    <div id="controls">
+      <!-- <div class="control-btns"> -->
+        <button onclick="stepVerse(-1)" class="button-prev-verse">Previous Verse</button>
+        <button onclick="changeView(-1)">Previous Find</button>
+        <button onclick="changeView(1)">Next Find</button>
         <button onclick="stepVerse(1)" button="button-next-verse">Next Verse</button>
-      </div>
+      <!-- </div> -->
 
     </div>
 
