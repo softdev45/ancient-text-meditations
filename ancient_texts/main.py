@@ -59,7 +59,7 @@ def keep_alive():
     # Wait for the server to start
     time.sleep(10)
     # Replace with your actual Render URL
-    url = "http://localhost:5000/health"
+    url = "https://ancient-text-meditations.onrender.com/health"
 
     while True:
         try:
