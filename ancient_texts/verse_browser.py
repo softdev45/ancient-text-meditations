@@ -4,6 +4,11 @@ from dataclasses import dataclass, asdict
 
 #import numpy as np
 
+def get_file_name(filepath):
+    version_name = filepath.split('/')[-1].split('.')[0] #fname without ext
+    return version_name
+
+
 @dataclass
 class Verse:
     text: str
@@ -25,25 +30,31 @@ class Verse:
 class VerseBrowser():
 
 
-    def __init__(self, filepath):
-        self.filepath = filepath
-        if filepath.endswith('.xml'):
-            self.load_xml_file()
+    def __init__(self, *filepaths):
+        self.data = {}
+        self.filepaths = filepaths
+        self.versions = []
+        for filepath in filepaths:
+            if filepath.endswith('.xml'):
+                self.load_xml_file(filepath)
         print('loaded bible data')
 
-    def load_xml_file(self):
-        self.xml_tree = etree.parse(self.filepath)
+    def load_xml_file(self, filepath):
+        self.xml_tree = etree.parse(filepath)
+        version_name = get_file_name(filepath) #fname without ext
+        self.versions.append(version_name)
         verses = self.xml_tree.xpath('//seg')
-        self.verses = list(map(lambda v: Verse(v.text.strip(), *v.attrib['id'].split('.')[1:]), verses )) #extract id
-        print(self.verses[:10])
-        print(type(self.verses[0].chapter))
+        self.data[version_name] = list(map(lambda v: Verse(v.text.strip(), *v.attrib['id'].split('.')[1:]), verses )) #extract id
+        print(f'loaded file: {filepath}')
 
-    def query(self, query):
+    def query(self, query, version= None):
+        verses = self.get_verses(version)
         ptrn = re.compile(rf"{query}")
-        self.last_query_result = result = [ v for v in self.verses if ptrn.search(v.text, re.IGNORECASE) ]
+        result = [ v for v in verses if ptrn.search(v.text, re.IGNORECASE) ]
         return result
     
-    def query_ref(self, ref):
+    def query_ref(self, ref, version = None):
+        verses = self.get_verses(version)
         # ref = list(map( lambda e: str(e), ref))
         print(ref)
         ref[1] = int(ref[1])
@@ -51,20 +62,24 @@ class VerseBrowser():
         if(len(ref)==3):
             ref[2] = int(ref[2])
 
-        result = [ asdict(v) for v in self.verses if ref[0] == v.book and ref[1] == v.chapter and (len(ref)<=2 or ref[2] == v.verse) ]
-        self.last_ref_query_result = result 
+        result = [ asdict(v) for v in verses if ref[0] == v.book and ref[1] == v.chapter and (len(ref)<=2 or ref[2] == v.verse) ]
         # print(result)
         return result
     
-    def query_word(self, word):
+    def query_word(self, word, version = None):
+        verses = self.get_verses(version)
+        print(verses[0])
+
         # print(word)
-        result = [ asdict(v) for v in self.verses if word.lower() in v.text.lower()]
-        self.last_word_query_result = result 
-        # print(result)
+        result = [ asdict(v) for v in verses if word.lower() in v.text.lower()]
+        print(result)
         return result
 
+    def get_versions(self):
+        return list(self.data.keys())
 
-        
-                
-
-
+    def get_verses(self, version = None):
+        verses = self.data[self.versions[0]]
+        if version:
+            verses = self.data[version]
+        return verses

@@ -38,21 +38,30 @@ def serve_sw():
 @app.route('/api/browshare/cmd', methods=['POST'])
 def bs_cmd():
     data = request.get_json()
-    print(data)
+    print('request:', data)
 
     verses = []
 
     cmd = data['cmd']
+    version = data['version'] if 'version' in data else None
     if cmd.startswith('<chapter>'):
         _cmd = cmd.split('>')[1].split("/")
-        verses = VB.query_ref(_cmd)
+        verses = VB.query_ref(_cmd, version)
     else:
-        verses = VB.query_word(cmd)
+        verses = VB.query_word(cmd, version)
     result = {
         'result' : verses,
-        'command' : cmd
+        'command' : cmd,
+        'version' : version
     }
     return jsonify(result)
+
+@app.route('/api/browshare/settings', methods=['GET'])
+def bs_settings():
+    settings = {
+        'versions' : VB.get_versions()
+    }
+    return jsonify(settings)
 
 
 def keep_alive():
@@ -101,7 +110,7 @@ import random
 from ancient_texts.verse_browser import VerseBrowser
 from tools.func_tools import gen_book_map
 
-VB = VerseBrowser('./bible_en.xml')
+VB = VerseBrowser('./bible_en.xml','./bible_pl.xml')
 book_map = gen_book_map()
 
 from ancient_texts.heb_char import h_rev

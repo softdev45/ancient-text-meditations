@@ -1,6 +1,10 @@
 
 const API_BASE = window.location.href.split('/')[0] + "/api/"
 const COMMAND_URL = API_BASE + 'browshare/cmd'; // POST endpoint
+const SETTINGS_URL = API_BASE + 'browshare/settings'; // POST endpoint
+
+let SETTINGS = {}
+let version = undefined
 
 const logDisplay = document.getElementById('log-display');
 const contentDisplay = document.getElementById('word');
@@ -19,8 +23,8 @@ let steppingOn = null
 
 
 function gtCurVerse() {
-  if (steppingOn=='chapter'){
-    return chapterData.get(currentBookChapter)[currentVerseNum-1]
+  if (steppingOn == 'chapter') {
+    return chapterData.get(currentBookChapter)[currentVerseNum - 1]
   }
   return currentCollection[currentIndex]
 }
@@ -95,14 +99,14 @@ async function sendCommand(command) {
   // const wordString = composedWord.map(tile => tile.title).join(' ');
 
 
-
+  console.log('sending cmd: ',version)
   try {
     const response = await fetch(COMMAND_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ cmd: command })
+      body: JSON.stringify({ cmd: command, version: version })
     });
 
     const data = await response.json();
@@ -321,6 +325,59 @@ if (queryInput) {
 }
 
 
+async function getSettings() {
+  try {
+    console.log('Getting settings...')
+    const response = await fetch(SETTINGS_URL, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      // body: JSON.stringify({ cmd: command })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      renderError(data.detail || data.message || `Server responded with status ${response.status}.`);
+    } else {
+
+      SETTINGS = data
+      console.log("Settings: ", SETTINGS)
+      version = SETTINGS['versions'][0]
+
+      const selectEl = document.getElementById('version-select');
+      const displayEl = document.getElementById('display-version');
+
+      // 3. Create the dropdown items from the list
+      SETTINGS['versions'].forEach(ver => {
+        const option = document.createElement('option');
+        option.value = ver;
+        option.textContent = ver;
+        selectEl.appendChild(option);
+      });
+
+      // Initial display update
+      displayEl.textContent = version;
+
+      // 4. Update the global variable on change
+      selectEl.addEventListener('change', (event) => {
+        version = event.target.value;
+        displayEl.textContent = version; // Update UI to show it worked
+        console.log("Global version is now:", version);
+      });
+
+      // renderView();
+
+    }
+  } catch (error) {
+    console.error('Analysis Request Error:', error);
+    renderError(`Could not connect to the analysis endpoint. (${error.message})`);
+  } finally {
+    // setProcessingState(false);
+    // updateWordDisplay();
+  }
+}
 
 
 async function goToRef(path) {
@@ -351,10 +408,19 @@ async function goToRef(path) {
   renderView(toRender);
 }
 
-// console.log(location.href)
-firstHref = location.href
-sendCommand('Jealous')
-goToRef(firstHref)
 
+document.addEventListener('DOMContentLoaded', function () {
+
+  console.log(SETTINGS)
+  if (!('version' in SETTINGS)) {
+    getSettings()
+  }
+
+  // console.log(location.href)
+  firstHref = location.href
+  sendCommand('Jealous')
+  goToRef(firstHref)
+
+});
 
 

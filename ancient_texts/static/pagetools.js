@@ -45,8 +45,10 @@ function rotateCustomFonts() {
     console.log(`Detected rendered font: ${cleanComputedStyle}`);
     console.log(`Switched to: ${nextFont}`);
 }
-initFonts();
 
+document.addEventListener('DOMContentLoaded', function () {
+    initFonts();
+});
 
 
 

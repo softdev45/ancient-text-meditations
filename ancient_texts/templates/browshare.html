@@ -42,14 +42,22 @@
 
     <div class="swiper-container">
 
-      <div class="swiper four-way-arrow touch-area"></div>
+      <div class="nav-swiper">
+        <div class="swiper four-way-arrow touch-area"></div>
+      </div>
+      <div class="nav-version">
+        <select id="version-select"></select>
+        <div id="display-version"></select>
+
+      </div>
+
     </div>
     <div id="controls">
       <!-- <div class="control-btns"> -->
-        <button onclick="stepVerse(-1)" class="button-prev-verse">Previous Verse</button>
-        <button onclick="changeView(-1)">Previous Find</button>
-        <button onclick="changeView(1)">Next Find</button>
-        <button onclick="stepVerse(1)" button="button-next-verse">Next Verse</button>
+      <button onclick="stepVerse(-1)" class="button-prev-verse">Previous Verse</button>
+      <button onclick="changeView(-1)">Previous Find</button>
+      <button onclick="changeView(1)">Next Find</button>
+      <button onclick="stepVerse(1)" button="button-next-verse">Next Verse</button>
       <!-- </div> -->
 
     </div>
