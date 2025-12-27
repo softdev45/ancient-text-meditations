@@ -5,12 +5,11 @@ import itertools
 from typing import List
 
 
-
 @dataclass
 class Scroll:
     bookname: str
     filepart: int
-    content: dict
+    content: list
     chapter: int = None
 
 
@@ -22,13 +21,26 @@ class Logos:
     punct: str
     grammar: str
     strongs_num: str
-    
+
 
 @dataclass
 class Library:
     scrolls: List[Scroll]
 
-    # def get(book, chapter, verse):
+    def get_ref(self, book, chapter, verse):
+        scrls = list(
+            filter(lambda el:
+                   (
+                       book.lower() in el.bookname.replace('_', '').lower() and
+                       int(chapter) == int(el.chapter)
+                   ),
+                   self.scrolls)
+        )
+        scrl = scrls[0]
+        result = scrl.content[int(verse)-1]
+        print(result)
+        return result
+
 
     def search(self, phrase: str):
         result = []
@@ -39,7 +51,6 @@ class Library:
                         result.append(verse)
                         break
         return result[:3]
-
 
 
 def build_books_lib(book_dir='./greek_nt_json'):

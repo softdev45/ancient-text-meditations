@@ -52,6 +52,7 @@ class Word:
         self.book = int(pos[1])
         self.chapter = int(pos[2])
         self.verse = int(pos[3])
+        self.book_name = BM[self.book]
 
         # ^object's fields were set^
 
@@ -66,6 +67,7 @@ class Word:
     def get_location(self, book_name=False):
         loc = (self.book,self.chapter,self.verse)
         if book_name:
+            #TODO use field
             loc = (BM[self.book],) + loc
         return  loc
 

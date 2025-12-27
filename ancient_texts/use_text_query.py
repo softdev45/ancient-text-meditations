@@ -10,13 +10,17 @@ SERVER_ENDPOINT_VERSE = "http://127.0.0.1:5001/verse"
 
 lib = None
 
-def get_greek(ref):
+def greek_search_word(search_phrase):
     global lib
     if not lib:
         lib = build_books_lib()
-    return lib.search(ref)
+    return lib.search(search_phrase)
 
-
+def greek_verse(ref):
+    global lib
+    if not lib:
+        lib = build_books_lib()
+    return lib.get_ref(ref[0], ref[1], ref[2])
 
 
 def get_verse(ref):

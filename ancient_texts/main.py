@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, session, send_from_directory
 from ancient_texts.core import get_nav_data
 
-from ancient_texts.use_text_query import trigger_request, get_verse, get_greek
+from ancient_texts.use_text_query import trigger_request, get_verse, greek_search_word, greek_verse
 import time
 
 import os
@@ -157,11 +157,14 @@ def get_grid_content():
 @app.route('/api/location', methods=['GET'])
 def location():
     loc:list = request.args.get('loc')
+    loc_seg = loc.split(',')
     verse_type:str = str(request.args.get('type', default=False))
 
     print('getting loc:', loc, 'verse_type=', verse_type)
 
     if verse_type == 'inter':
+        if book_map.index(loc_seg[0]) > book_map.index('MAT'):
+            return jsonify(greek_verse(loc_seg))
         return jsonify(get_verse(loc))
 
 
@@ -304,7 +307,7 @@ def process_command():
     elif '#' in command:
         verses = VB.query_word(command[1:])
     elif '$' in command:
-        verses = get_greek(command[1:])
+        verses = greek_search_word(command[1:])
     # elif '%' in command:
     #     verses 
     

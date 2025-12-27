@@ -742,7 +742,7 @@
                                 // --- 3. Process and Add Data to Page ---
                                 const verseText = document.createElement('div');
                                 console.log(data);
-                                verseText.appendChild(createSentenceBlocks(data));
+                                verseText.appendChild(buildSentenceOfWordBlocks(data));
                                 get_verse_interlinear.appendChild(verseText); //link -< parent
 
 
@@ -830,7 +830,7 @@
              * @param {string[]} wordList - Array of words/strings to display as blocks.
              * @returns {HTMLElement} A DIV element containing the word blocks.
              */
-            function createSentenceBlocks(wordList) {
+            function buildSentenceOfWordBlocks(wordList) {
                 const container = document.createElement('div');
                 container.classList.add('result-block-container'); // Styled for flex layout and background
 

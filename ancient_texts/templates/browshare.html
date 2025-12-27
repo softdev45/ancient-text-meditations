@@ -39,15 +39,21 @@
     <div id="word">
 
     </div>
+    <div id="interlinear">
+
+    </div>
 
     <div class="swiper-container">
 
+      <div class="nav-text">
+        <button id="load-ancient" onclick="loadAncientText()">AncientText</button>
+      </div>
       <div class="nav-swiper">
         <div class="swiper four-way-arrow touch-area"></div>
       </div>
       <div class="nav-version">
         <select id="version-select"></select>
-        <div id="display-version"></select>
+        <!-- <div id="display-version"></select> -->
 
       </div>
 
@@ -68,7 +74,7 @@
 
   </main>
   <script src="{{ url_for('static', filename='pagetools.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='browshare.js') }}" defer></script>
+  <script type="module" src="{{ url_for('static', filename='browshare.js') }}" defer></script>
   <!-- <script src="{{ url_for('static', filename='TinyGesture.min.js') }}" defer></script> -->
   <!-- <script src="https://cdn.jsdelivr.net/npm/tinygesture@3.0.0/dist/TinyGesture.min.js"></script> -->
   <script type="module">

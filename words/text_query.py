@@ -6,8 +6,14 @@ import pylcs
 
 def verse_query(ref: str):
 	result = []
-	loc = list(map(lambda el: int(el), ref.split(',')[1:]))
-	result = list(filter(lambda el: loc[0]==el.book and loc[1]==el.chapter and loc[2] == el.verse, Word.db))
+	ref_seg = ref.split(',')
+	if len(ref_seg) == 4:
+		loc = list(map(lambda el: int(el), ref.split(',')[1:]))
+		result = list(filter(lambda el: loc[0]==el.book and loc[1]==el.chapter and loc[2] == el.verse, Word.db))
+	else:
+		loc = list(map(lambda el: int(el), ref_seg[1:]))
+		loc.insert(0,ref_seg[0])
+		result = list(filter(lambda el: loc[0]==el.book_name and loc[1]==el.chapter and loc[2] == el.verse, Word.db))
 	result = list(map(lambda wrd: wrd.get_data(), result))
 	return result
 

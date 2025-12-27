@@ -1,13 +1,16 @@
+import { buildSentenceOfWordBlocks } from "./blockbuilder.js";
 
 const API_BASE = window.location.href.split('/')[0] + "/api/"
 const COMMAND_URL = API_BASE + 'browshare/cmd'; // POST endpoint
 const SETTINGS_URL = API_BASE + 'browshare/settings'; // POST endpoint
+const LOC_URL = API_BASE + 'location'; // POST endpoint
 
 let SETTINGS = {}
 let version = undefined
 
 const logDisplay = document.getElementById('log-display');
 const contentDisplay = document.getElementById('word');
+let interlinear_div = document.getElementById('interlinear')
 
 let wordSearchResults = new Map()
 let chapterData = new Map()
@@ -50,7 +53,7 @@ function getCurrPath() {
   if (!wordSearchResults) {
     return '#'
   }
-  return `#/${lastCommand}/${currentIndex}/${currentBookChapter}/${currentVerseNum}`
+  return `#/${version.split('_')[1]}/${lastCommand}/${currentIndex}/${currentBookChapter}/${currentVerseNum}`
 }
 
 function getCurrentBookChapter() {
@@ -89,6 +92,36 @@ function handleCommandResult(data) {
 }
 
 
+/* function buildSentenceOfWordBlocks(wordList) {
+  const container = document.createElement('div');
+  container.classList.add('result-block-container'); // Styled for flex layout and background
+
+  if (!Array.isArray(wordList) || wordList.length === 0) {
+    container.textContent = "No result blocks to display.";
+    container.classList.add('message');
+    return container;
+  }
+
+  wordList.forEach(word => {
+    const block = document.createElement('div');
+    block.style.display = "inline";
+    block.classList.add('result-block-item', 'oh-font'); // Styled as a colored block
+    // block.textContent = word.join('<br>');
+    word.slice(0, 4).forEach((part, index) => {
+      const subblock = document.createElement('div');
+      if (index <= 1) {
+        subblock.classList.add('large-font')
+      }
+      subblock.innerText = part
+      block.appendChild(subblock);
+
+    })
+    container.appendChild(block);
+  });
+
+  return container;
+} */
+
 async function sendCommand(command) {
   // if (command.length === 0 || isProcessing) return;
 
@@ -99,7 +132,7 @@ async function sendCommand(command) {
   // const wordString = composedWord.map(tile => tile.title).join(' ');
 
 
-  console.log('sending cmd: ',version)
+  console.log('sending cmd for v.: ', version)
   try {
     const response = await fetch(COMMAND_URL, {
       method: 'POST',
@@ -202,6 +235,7 @@ function renderView(elemToRender = undefined) {
   // });
 
   contentDisplay.appendChild(resultNode)
+  interlinear_div.innerHTML = '';
 
   history.replaceState(null, null, getCurrPath())
 
@@ -257,8 +291,27 @@ function renderError(message) {
                 `;
 }
 
+async function loadAncientText() {
 
-document.addEventListener('keydown', function (event) {
+  let loc = `${currentBookChapter},${currentVerseNum}`
+  loc = loc.replace('/', ',')
+  const response = await fetch(LOC_URL + `?loc=${encodeURIComponent(loc)}&type=inter`);
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+
+  const data = await response.json(); // Process the response body as JSON
+
+  // --- 3. Process and Add Data to Page ---
+  const verseText = document.createElement('div');
+  verseText.appendChild(buildSentenceOfWordBlocks(data));
+  interlinear_div.innerHTML = ''
+  interlinear_div.appendChild(verseText); //link -< parent
+
+}
+
+document.addEventListener('keydown', async function (event) {
   // Check if the pressed key is the tilde (~) key.
   // The key value might be '~' or '`' depending on keyboard layout.
   if (event.key === '~' || event.key === '`') {
@@ -296,6 +349,12 @@ document.addEventListener('keydown', function (event) {
   if (event.key === "ArrowRight") {
     event.preventDefault()
     stepVerse(1)
+  }
+
+  if (event.ctrlKey && event.key === "h") {
+
+    loadAncientText()
+
   }
 });
 
@@ -347,7 +406,7 @@ async function getSettings() {
       version = SETTINGS['versions'][0]
 
       const selectEl = document.getElementById('version-select');
-      const displayEl = document.getElementById('display-version');
+      // const displayEl = document.getElementById('display-version');
 
       // 3. Create the dropdown items from the list
       SETTINGS['versions'].forEach(ver => {
@@ -358,12 +417,12 @@ async function getSettings() {
       });
 
       // Initial display update
-      displayEl.textContent = version;
+      // displayEl.textContent = version;
 
       // 4. Update the global variable on change
       selectEl.addEventListener('change', (event) => {
         version = event.target.value;
-        displayEl.textContent = version; // Update UI to show it worked
+        // displayEl.textContent = version; // Update UI to show it worked
         console.log("Global version is now:", version);
       });
 
@@ -388,6 +447,7 @@ async function goToRef(path) {
     return
   }
 
+  version = 'bible_' + path.at(-6)
   lastCommand = pth.at(-5);
   if (!wordSearchResults.has(lastCommand)) {
     await sendCommand(lastCommand)
@@ -424,3 +484,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+window.stepVerse = stepVerse;
+window.changeView = changeView;
+window.loadAncientText = loadAncientText;
