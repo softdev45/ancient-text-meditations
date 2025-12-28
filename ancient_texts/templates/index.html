@@ -29,6 +29,11 @@
 		font-size: 2em;
         font-weight: 700;
 	}
+    @media (max-width:500px) {
+      .large-font {
+        /* font-size: 1.5rem;         */
+      }
+    }
 
         /* --- Header Panel Styling (Thin, Dark, Full Width) --- */
         .header-panel {
@@ -168,6 +173,13 @@
             flex-direction: column;
             gap: 10px;
         }
+        @media (max-width:500px) {
+            .word-builder-container {
+                width: 100%;
+
+                
+                }
+            }
         
         #word-display {
             min-height: 40px;
@@ -378,6 +390,11 @@
             gap: 15px; /* Space between history items */
             min-height: 150px;
             text-align: center;
+        }
+        @media (max-width: 500px) {
+            #content-display {
+                width: 100%;
+            }
         }
         
         .message {
