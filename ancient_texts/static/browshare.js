@@ -69,7 +69,7 @@ function handleCommandResult(data) {
   console.log('Handling cmd result:', data)
   if (data.command.startsWith('<chapter>')) {
     // const currentData = getCurrentVerse()
-    const cmdBookChapter = data.command.split('>')[1]
+    const cmdBookChapter = version.split('_')[1] +'/'+data.command.split('>')[1]
     // chapterData.set(getBookChapter(getCurrentVerse()), data.result)
     chapterData.set(cmdBookChapter, data.result)
     // renderView()
