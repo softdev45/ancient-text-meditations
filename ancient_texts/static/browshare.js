@@ -57,7 +57,7 @@ function getCurrPath() {
 }
 
 function getCurrentBookChapter() {
-  return `${gtCurVerse().book}/${gtCurVerse().chapter}`;
+  return `${version.split('_')[1]}/${gtCurVerse().book}/${gtCurVerse().chapter}`;
 }
 
 function selectVerse() {
