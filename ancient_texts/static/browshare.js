@@ -273,7 +273,7 @@ function stepVerse(step) {
   }
 
   if (!chapterData.has(currentBookChapter)) {
-    sendCommand(`<chapter>${currentBookChapter}`)
+    sendCommand(`<chapter>${currentBookChapter.split('/')[1]}`)
   } else {
     console.log(currentVerseNum)
     let currVerse = chapterData.get(currentBookChapter)[currentVerseNum - 1]
@@ -293,7 +293,7 @@ function renderError(message) {
 
 async function loadAncientText() {
 
-  let loc = `${currentBookChapter},${currentVerseNum}`
+  let loc = `${currentBookChapter.split('/')[1]},${currentVerseNum}`
   loc = loc.replace('/', ',')
   const response = await fetch(LOC_URL + `?loc=${encodeURIComponent(loc)}&type=inter`);
 
@@ -453,7 +453,7 @@ async function goToRef(path) {
     await sendCommand(lastCommand)
   }
 
-  let bookChap = `${pth.at(-3)}/${pth.at(-2)}`
+  let bookChap = `${path.at(-6)}/${pth.at(-3)}/${pth.at(-2)}`
   if (!chapterData.has(bookChap)) (
     await sendCommand(`<chapter>${bookChap}`)
   )
