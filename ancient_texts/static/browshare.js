@@ -273,7 +273,8 @@ function stepVerse(step) {
   }
 
   if (!chapterData.has(currentBookChapter)) {
-    indexOfFirstSep = currentBookChapter.indexOf('/')
+    console.log(currentBookChapter)
+    const indexOfFirstSep = currentBookChapter.indexOf('/')
     sendCommand(`<chapter>${currentBookChapter.slice(indexOfFirstSep + 1)}`)
   } else {
     console.log(currentVerseNum)
@@ -294,7 +295,8 @@ function renderError(message) {
 
 async function loadAncientText() {
 
-  indexOfFirstSep = currentBookChapter.indexOf('/')
+  console.log(currentBookChapter)
+  const indexOfFirstSep = currentBookChapter.indexOf('/')
   let loc = `${currentBookChapter.slice(indexOfFirstSep + 1)},${currentVerseNum}`
   loc = loc.replace('/', ',')
   const response = await fetch(LOC_URL + `?loc=${encodeURIComponent(loc)}&type=inter`);
@@ -449,19 +451,19 @@ async function goToRef(path) {
     return
   }
 
-  version = 'bible_' + path.at(-6)
-  lastCommand = pth.at(-5);
+  version = 'bible_' + path.at(-7)
+  lastCommand = pth.at(-6);
   if (!wordSearchResults.has(lastCommand)) {
     await sendCommand(lastCommand)
   }
-
-  let bookChap = `${path.at(-6)}/${pth.at(-3)}/${pth.at(-2)}`
+  // lang: 7 or 4
+  let bookChap = `${path.at(-7)}/${pth.at(-3)}/${pth.at(-2)}`
   if (!chapterData.has(bookChap)) (
     await sendCommand(`<chapter>${bookChap}`)
   )
 
   console.log('Setting current from path: ', path)
-  currentIndex = Number(pth.at(-4))
+  currentIndex = Number(pth.at(-5))
   currentVerseNum = Number(pth.at(-1))
   currentBookChapter = bookChap; //pth.at(-3)
   console.log(currentVerseNum, typeof (currentVerseNum))
