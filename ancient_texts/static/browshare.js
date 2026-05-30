@@ -426,6 +426,7 @@ async function getSettings() {
       // 4. Update the global variable on change
       selectEl.addEventListener('change', (event) => {
         version = event.target.value;
+        selectVerse()
         // displayEl.textContent = version; // Update UI to show it worked
         console.log("Global version is now:", version);
       });
