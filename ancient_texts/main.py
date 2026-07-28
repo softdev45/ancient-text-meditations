@@ -68,7 +68,7 @@ def keep_alive():
     # Wait for the server to start
     time.sleep(10)
     # Replace with your actual Render URL
-    url = "https://ancient-text-meditations.onrender.com/health"
+    url = "https://browshare.onrender.com/health"
 
     while True:
         try:
@@ -163,7 +163,7 @@ def location():
     print('getting loc:', loc, 'verse_type=', verse_type)
 
     if verse_type == 'inter':
-        if book_map.index(loc_seg[0]) > book_map.index('MAT'):
+        if book_map.index(loc_seg[0]) >= book_map.index('MAT'):
             return jsonify(greek_verse(loc_seg))
         return jsonify(get_verse(loc))
 
