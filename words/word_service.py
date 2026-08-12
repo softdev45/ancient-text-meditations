@@ -64,7 +64,7 @@ def get_related_words():
     else:
         # words = list(filter( lambda el: (print(el.split('/')) or True) and el.split('/')[2][0].islower(),  map(lambda el: el[1][0].repr2(), words))) #1-wordlist, 0-first; el -> (dist, [word-occur], 'word')
         # filter-out duplicates by root
-        names_present = set()
+        #names_present = set()
 
         
         words =  list(map(lambda el: unique_by(el[1], lambda el: el.en), words)) #[1]-wordlist, [0]-first; el -> (dist, [word-occur], 'word')
@@ -74,12 +74,12 @@ def get_related_words():
 
         if len(words) > 3:
             #TODO refactor prod-quickfix (YHWH)
-            words = list(filter( lambda el: el.en=='YHWH' or el.en[0].islower(),  words))         
+            words = list(filter( lambda el: el.en=='YHWH' or el.en=='Uriah' or el.en =='Ur' or el.en[0].islower(),  words))         
 
         print('before 2nd unique_by len', len(words))
         # related_list = list(map( lambda wrd: wrd.en, words))
         #TODO
-        words = unique_by(words, lambda el: el.en)
+        words = unique_by(words, lambda el: el.ctx_en)
         print('after unique_by len', len(words))
         def get_word(w):
             # print(w)
