@@ -56,19 +56,19 @@ class VerseBrowser():
     def query_ref(self, ref, version = None):
         verses = self.get_verses(version)
         # ref = list(map( lambda e: str(e), ref))
-        print(ref)
+        print("ref: ", ref)
         ref[1] = int(ref[1])
         #quick fix for PROD; TODO: refactor
         if(len(ref)==3):
             ref[2] = int(ref[2])
 
-        result = [ asdict(v) for v in verses if ref[0] == v.book and ref[1] == v.chapter and (len(ref)<=2 or ref[2] == v.verse) ]
-        # print(result)
+        result = [ asdict(v) for v in verses if ref[0] == v.book and ref[1] == v.chapter and (True or len(ref)<=2 or ref[2] == v.verse) ]
+        print('result: ', result)
         return result
     
     def query_word(self, word, version = None):
         verses = self.get_verses(version)
-        print(verses[0])
+        # print(verses[0])
 
         # print(word)
         result = [ asdict(v) for v in verses if word.lower() in v.text.lower()]

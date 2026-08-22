@@ -47,6 +47,9 @@ def bs_cmd():
     if cmd.startswith('<chapter>'):
         _cmd = cmd.split('>')[1].split("/")
         verses = VB.query_ref(_cmd, version)
+    elif cmd.startswith('@'):
+        _cmd = cmd[1:].split(':')
+        verses = VB.query_ref(_cmd, version) 
     else:
         verses = VB.query_word(cmd, version)
     result = {
