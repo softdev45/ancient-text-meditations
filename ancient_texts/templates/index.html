@@ -787,7 +787,8 @@
                                 // --- 3. Process and Add Data to Page ---
                                 const verseText = document.createElement('div');
                                 console.log(data)
-                                verseText.innerText = data[0].text;
+                                // let loc_verse = parseInt(loc.split(':')[2])
+                                verseText.innerText = data[loc[3] - 1].text;
                                 get_verse_link.appendChild(verseText); //linlinkk -< parent
 
                                     next = loc.slice()
